@@ -1,9 +1,9 @@
 server:
-  port: 5011
+  port: 5012
 
 spring:
   application:
-    name: item-service
+    name: cart-service
 
   jpa:
     show-sql: false

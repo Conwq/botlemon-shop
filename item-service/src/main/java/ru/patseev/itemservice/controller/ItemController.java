@@ -28,7 +28,6 @@ public class ItemController {
 
 	@PostMapping("/add")
 	public ResponseEntity<InfoResponse> addItem(@RequestBody ItemDto itemDto) {
-		System.out.println(itemDto);
 		return itemService.addItem(itemDto);
 	}
 
