@@ -30,22 +30,22 @@ public class ItemEntity {
 
 	private BigDecimal price;
 
-	private Integer count;
-
 	private BigDecimal rating;
 
 	private Integer voters;
 
 	private Timestamp publicationDate;
 
-	@ManyToMany(mappedBy = "itemList", fetch = FetchType.LAZY)
-	private List<UserEntity> userList;
+	@OneToMany(mappedBy = "itemEntity",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<CartEntity> cartEntities;
 
-	public void addUser(UserEntity userEntity) {
-		if (userList == null) {
-			userList = new ArrayList<>();
+	public List<CartEntity> getCartEntities() {
+		if (cartEntities == null) {
+			return new ArrayList<>();
 		}
 
-		userList.add(userEntity);
+		return cartEntities;
 	}
 }

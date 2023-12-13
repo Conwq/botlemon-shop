@@ -20,6 +20,7 @@
         <module>users-service</module>
         <module>item-service</module>
         <module>cart-service</module>
+        <module>storage-service</module>
     </modules>
 
     <properties>

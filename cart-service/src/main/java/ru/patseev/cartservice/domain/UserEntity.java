@@ -39,29 +39,21 @@ public class UserEntity {
 	@JoinColumn(name = "role_id")
 	private RoleEntity roleEntity;
 
-	@ManyToMany
-	@JoinTable(
-			name = "carts",
-			schema = "botlemon",
-			joinColumns = @JoinColumn(name = "user_id"),
-			inverseJoinColumns = @JoinColumn(name = "item_id")
-	)
-	private List<ItemEntity> itemList;
-
-	public void addItem(ItemEntity itemEntity) {
-		if (itemList == null) {
-			itemList = new ArrayList<>();
-		}
-
-		itemList.add(itemEntity);
-	}
-
-	public void removeItem(ItemEntity itemEntity) {
-		itemList.remove(itemEntity);
-	}
+	@OneToMany(mappedBy = "userEntity",
+			cascade = CascadeType.ALL,
+			orphanRemoval = true)
+	private List<CartEntity> cartEntities;
 
 	@Override
 	public String toString() {
 		return String.format("User: id -> %s, user -> %s", id, username);
+	}
+
+	public List<CartEntity> getCartEntities() {
+		if (cartEntities == null) {
+			return new ArrayList<>();
+		}
+
+		return cartEntities;
 	}
 }

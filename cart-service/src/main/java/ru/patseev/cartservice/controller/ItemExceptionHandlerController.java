@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import ru.patseev.cartservice.dto.ExceptionResponse;
 import ru.patseev.cartservice.exception.ItemNotFoundException;
+import ru.patseev.cartservice.exception.UnacceptableQualityItemsException;
 import ru.patseev.cartservice.exception.UserNotFoundException;
 
 import java.time.Instant;
@@ -15,24 +16,27 @@ public class ItemExceptionHandlerController {
 
 	@ExceptionHandler(ItemNotFoundException.class)
 	public ResponseEntity<ExceptionResponse> itemBotFoundExceptionHandler(ItemNotFoundException e) {
-		return createExceptionResponse(e);
+		return createExceptionResponse(e, HttpStatus.NOT_FOUND);
 	}
 
 	@ExceptionHandler(UserNotFoundException.class)
 	public ResponseEntity<ExceptionResponse> userNotFoundExceptionHandler(UserNotFoundException e) {
-		return createExceptionResponse(e);
+		return createExceptionResponse(e, HttpStatus.NOT_FOUND);
 	}
 
-	private ResponseEntity<ExceptionResponse> createExceptionResponse(RuntimeException e) {
+	@ExceptionHandler(UnacceptableQualityItemsException.class)
+	public ResponseEntity<ExceptionResponse> unacceptableQualityItemsExceptionHandler(UnacceptableQualityItemsException e) {
+		return createExceptionResponse(e, HttpStatus.EXPECTATION_FAILED);
+	}
 
-		HttpStatus notFound = HttpStatus.NOT_FOUND;
+	private ResponseEntity<ExceptionResponse> createExceptionResponse(RuntimeException e, HttpStatus status) {
 
 		ExceptionResponse response = ExceptionResponse.builder()
-				.status(notFound)
+				.status(status)
 				.message(e.getMessage())
 				.createdAt(Instant.now().toString())
 				.build();
 
-		return new ResponseEntity<>(response, notFound);
+		return new ResponseEntity<>(response, status);
 	}
 }

@@ -28,8 +28,6 @@ public class ItemEntity {
 
 	private BigDecimal price;
 
-	private Integer count;
-
 	private BigDecimal rating;
 
 	private Integer voters;

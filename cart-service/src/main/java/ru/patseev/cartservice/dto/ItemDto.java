@@ -22,11 +22,13 @@ public class ItemDto {
 
 	private BigDecimal price;
 
-	private Integer count;
-
 	private BigDecimal rating;
 
 	private Integer voters;
 
 	private Timestamp publicationDate;
+
+	private Integer quantity;
+
+	private BigDecimal totalPrice;
 }

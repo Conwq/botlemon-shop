@@ -1,10 +1,12 @@
 package ru.patseev.itemservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import ru.patseev.itemservice.domain.ItemEntity;
 import ru.patseev.itemservice.dto.Actions;
 import ru.patseev.itemservice.dto.InfoResponse;
@@ -28,39 +30,57 @@ public class ItemService {
 
 	private final ItemMapper itemMapper;
 
+	private final RestTemplate restTemplate;
+
 	@Transactional(readOnly = true)
-	public ItemDto getItemById(int id) {
-		return itemRepository
-				.findById(id)
-				.map(itemMapper::toDto)
+	public ItemDto getItemById(int itemId) {
+		int itemQuantity = Objects.requireNonNull(restTemplate.getForObject(
+				"http://localhost:5013/v1/api/storage/{itemId}",
+				Integer.class,
+				itemId));
+
+		ItemDto itemDto = itemRepository
+				.findById(itemId)
+				.map(this::getItemWithQuantity)
 				.orElseThrow(() -> new ItemNotFoundException("Item not found"));
+
+		itemDto.setQuantity(itemQuantity);
+
+		return itemDto;
 	}
 
 	@Transactional(readOnly = true)
 	public List<ItemDto> getAllItems() {
-
 		return itemRepository
 				.findAll()
-				.stream().map(itemMapper::toDto)
+				.stream()
+				.map(this::getItemWithQuantity)
 				.collect(Collectors.toList());
 	}
 
-	@Transactional
 	public ResponseEntity<InfoResponse> addItem(ItemDto itemDto) {
-
 		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
 		itemEntity.setPublicationDate(Timestamp.from(Instant.now()));
 		itemEntity.setRating(new BigDecimal("0.0"));
 		itemEntity.setVoters(0);
 
-		itemRepository.save(itemEntity);
+		int itemId = itemRepository
+				.save(itemEntity)
+				.getId();
+
+		restTemplate.exchange(
+				"http://localhost:5013/v1/api/storage/{itemId}/{quantity}",
+				HttpMethod.POST,
+				null,
+				Void.class,
+				itemId,
+				itemDto.getQuantity());
 
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
 	}
 
 	@Transactional
 	public ResponseEntity<InfoResponse> editItem(ItemDto itemDto) {
-
 		itemRepository
 				.findById(itemDto.getId())
 				.map(itemEntity -> {
@@ -73,11 +93,16 @@ public class ItemService {
 	}
 
 	@Transactional
-	public ResponseEntity<InfoResponse> deleteItem(int id) {
-		if (!itemRepository.existsById(id)) {
+	public ResponseEntity<InfoResponse> deleteItem(int itemId) {
+		if (!itemRepository.existsById(itemId)) {
 			throw new ItemNotFoundException("Item not found");
 		}
-		itemRepository.deleteById(id);
+
+		restTemplate.delete(
+				"http://localhost:5013/v1/api/storage/{itemId}",
+				itemId);
+
+		itemRepository.deleteById(itemId);
 		return createResponse(Actions.DELETE, HttpStatus.OK);
 	}
 
@@ -87,9 +112,32 @@ public class ItemService {
 	}
 
 	private void updateItemField(ItemDto itemDto, ItemEntity itemEntity) {
-		if (Objects.nonNull(itemDto.getName())) itemEntity.setName(itemDto.getName());
-		if (Objects.nonNull(itemDto.getDescription())) itemEntity.setDescription(itemDto.getDescription());
-		if (Objects.nonNull(itemDto.getPrice())) itemEntity.setPrice(itemDto.getPrice());
-		if (Objects.nonNull(itemDto.getCount())) itemEntity.setCount(itemDto.getCount());
+		final String name;
+		final String description;
+		final BigDecimal price;
+		final Integer quantity;
+
+		if (Objects.nonNull(name = itemDto.getName())) itemEntity.setName(name);
+		if (Objects.nonNull(description = itemDto.getDescription())) itemEntity.setDescription(description);
+		if (Objects.nonNull(price = itemDto.getPrice())) itemEntity.setPrice(price);
+		if (Objects.nonNull(quantity = itemDto.getQuantity())) {
+			restTemplate.put(
+					"http://localhost:5013/v1/api/storage/{itemId}/{quantity}",
+					null,
+					itemDto.getId(),
+					quantity);
+		}
+	}
+
+	private ItemDto getItemWithQuantity(ItemEntity itemEntity) {
+		int itemQuantity = Objects.requireNonNull(restTemplate.getForObject(
+				"http://localhost:5013/v1/api/storage/{itemId}",
+				Integer.class,
+				itemEntity.getId()));
+
+		ItemDto dto = itemMapper.toDto(itemEntity);
+		dto.setQuantity(itemQuantity);
+
+		return dto;
 	}
 }

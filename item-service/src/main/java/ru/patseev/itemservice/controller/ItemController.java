@@ -16,12 +16,12 @@ public class ItemController {
 
 	private final ItemService itemService;
 
-	@GetMapping("/{id}/get")
-	public ItemDto getItem(@PathVariable("id") int id) {
-		return itemService.getItemById(id);
+	@GetMapping("/{itemId}")
+	public ItemDto getItem(@PathVariable("itemId") int itemId) {
+		return itemService.getItemById(itemId);
 	}
 
-	@GetMapping("/get")
+	@GetMapping("")
 	public List<ItemDto> getItemsList() {
 		return itemService.getAllItems();
 	}
@@ -36,7 +36,7 @@ public class ItemController {
 		return itemService.editItem(itemDto);
 	}
 
-	@DeleteMapping("/{id}/delete")
+	@DeleteMapping("/{id}")
 	public ResponseEntity<InfoResponse> deleteItem(@PathVariable("id") int id) {
 		return itemService.deleteItem(id);
 	}

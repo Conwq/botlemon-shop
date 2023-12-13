@@ -3,6 +3,7 @@ package ru.patseev.cartservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.patseev.cartservice.dto.CartRequest;
 import ru.patseev.cartservice.dto.InfoResponse;
 import ru.patseev.cartservice.dto.ItemDto;
 import ru.patseev.cartservice.service.CartService;
@@ -21,15 +22,15 @@ public class CartController {
 		return cartService.getUserShoppingCart(userId);
 	}
 
-	@PostMapping("/{userId}/{itemId}")
+	@PostMapping("/{userId}")
 	public ResponseEntity<InfoResponse> addItemToCart(@PathVariable("userId") int userId,
-													  @PathVariable("itemId") int itemId) {
-		return cartService.addItemToCart(userId, itemId);
+													  @RequestBody CartRequest request) {
+		return cartService.addItemToCart(userId, request);
 	}
 
-	@DeleteMapping("/{userId}/{itemId}")
+	@DeleteMapping("/{userId}")
 	public ResponseEntity<InfoResponse> removeItemFromCart(@PathVariable("userId") int userId,
-														   @PathVariable("itemId") int itemId) {
-		return cartService.removeItemFromCart(userId, itemId);
+														   @RequestBody CartRequest request) {
+		return cartService.removeItemFromCart(userId, request);
 	}
 }

@@ -1,5 +1,6 @@
-package ru.patseev.itemservice.dto;
+package ru.patseev.storageservice.domain;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,12 +9,17 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
 
+@Entity
+@Table(schema = "botlemon", name = "items")
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ItemDto {
+public class ItemEntity {
 
+	@Id
+	@Column(name = "item_id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 
 	private String name;
@@ -28,5 +34,6 @@ public class ItemDto {
 
 	private Timestamp publicationDate;
 
-	private Integer quantity;
+	@OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
+	private StorageEntity storage;
 }
