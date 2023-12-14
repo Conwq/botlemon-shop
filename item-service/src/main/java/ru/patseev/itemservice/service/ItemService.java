@@ -1,12 +1,11 @@
 package ru.patseev.itemservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import ru.patseev.itemservice.domain.ItemEntity;
 import ru.patseev.itemservice.dto.Actions;
 import ru.patseev.itemservice.dto.InfoResponse;
@@ -30,23 +29,14 @@ public class ItemService {
 
 	private final ItemMapper itemMapper;
 
-	private final RestTemplate restTemplate;
+	private final WebClient.Builder webClientBuilder;
 
 	@Transactional(readOnly = true)
 	public ItemDto getItemById(int itemId) {
-		int itemQuantity = Objects.requireNonNull(restTemplate.getForObject(
-				"http://localhost:5013/v1/api/storage/{itemId}",
-				Integer.class,
-				itemId));
-
-		ItemDto itemDto = itemRepository
+		return itemRepository
 				.findById(itemId)
 				.map(this::getItemWithQuantity)
 				.orElseThrow(() -> new ItemNotFoundException("Item not found"));
-
-		itemDto.setQuantity(itemQuantity);
-
-		return itemDto;
 	}
 
 	@Transactional(readOnly = true)
@@ -59,22 +49,11 @@ public class ItemService {
 	}
 
 	public ResponseEntity<InfoResponse> addItem(ItemDto itemDto) {
-		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
-		itemEntity.setPublicationDate(Timestamp.from(Instant.now()));
-		itemEntity.setRating(new BigDecimal("0.0"));
-		itemEntity.setVoters(0);
+		ItemEntity itemEntity = this.createItemEntity(itemDto);
 
-		int itemId = itemRepository
-				.save(itemEntity)
-				.getId();
+		int itemId = itemRepository.save(itemEntity).getId();
 
-		restTemplate.exchange(
-				"http://localhost:5013/v1/api/storage/{itemId}/{quantity}",
-				HttpMethod.POST,
-				null,
-				Void.class,
-				itemId,
-				itemDto.getQuantity());
+		this.saveQuantityItemToStorage(itemId, itemDto.getQuantity());
 
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
 	}
@@ -98,11 +77,9 @@ public class ItemService {
 			throw new ItemNotFoundException("Item not found");
 		}
 
-		restTemplate.delete(
-				"http://localhost:5013/v1/api/storage/{itemId}",
-				itemId);
-
+		this.deleteQuantityItemFromStorage(itemId);
 		itemRepository.deleteById(itemId);
+		
 		return createResponse(Actions.DELETE, HttpStatus.OK);
 	}
 
@@ -115,29 +92,75 @@ public class ItemService {
 		final String name;
 		final String description;
 		final BigDecimal price;
-		final Integer quantity;
 
-		if (Objects.nonNull(name = itemDto.getName())) itemEntity.setName(name);
-		if (Objects.nonNull(description = itemDto.getDescription())) itemEntity.setDescription(description);
-		if (Objects.nonNull(price = itemDto.getPrice())) itemEntity.setPrice(price);
-		if (Objects.nonNull(quantity = itemDto.getQuantity())) {
-			restTemplate.put(
-					"http://localhost:5013/v1/api/storage/{itemId}/{quantity}",
-					null,
-					itemDto.getId(),
-					quantity);
+		if (Objects.nonNull(name = itemDto.getName())) {
+			itemEntity.setName(name);
+		}
+		if (Objects.nonNull(description = itemDto.getDescription())) {
+			itemEntity.setDescription(description);
+		}
+		if (Objects.nonNull(price = itemDto.getPrice())) {
+			itemEntity.setPrice(price);
+		}
+		if (Objects.nonNull(itemDto.getQuantity())) {
+			this.updateStorageQuantity(itemDto);
 		}
 	}
 
+	private void updateStorageQuantity(ItemDto itemDto) {
+		webClientBuilder
+				.build()
+				.put()
+				.uri("http://storage-service/v1/api/storage/{itemId}/{quantity}",
+						uriBuilder -> uriBuilder.build(itemDto.getId(), itemDto.getQuantity()))
+				.retrieve()
+				.toBodilessEntity()
+				.block();
+	}
+
 	private ItemDto getItemWithQuantity(ItemEntity itemEntity) {
-		int itemQuantity = Objects.requireNonNull(restTemplate.getForObject(
-				"http://localhost:5013/v1/api/storage/{itemId}",
-				Integer.class,
-				itemEntity.getId()));
+		Integer quantity = webClientBuilder
+				.build()
+				.get()
+				.uri("http://storage-service/v1/api/storage/{itemId}",
+						uriBuilder -> uriBuilder.build(itemEntity.getId()))
+				.retrieve()
+				.bodyToMono(Integer.class)
+				.block();
 
-		ItemDto dto = itemMapper.toDto(itemEntity);
-		dto.setQuantity(itemQuantity);
+		ItemDto itemDto = itemMapper.toDto(itemEntity);
+		itemDto.setQuantity(quantity);
 
-		return dto;
+		return itemDto;
+	}
+
+	private ItemEntity createItemEntity(ItemDto itemDto) {
+		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
+		itemEntity.setPublicationDate(Timestamp.from(Instant.now()));
+		itemEntity.setRating(new BigDecimal("0.0"));
+		itemEntity.setVoters(0);
+		return itemEntity;
+	}
+
+	private void saveQuantityItemToStorage(int itemId, int itemQuantity) {
+		webClientBuilder
+				.build()
+				.post()
+				.uri("http://storage-service/v1/api/storage/{itemId}/{quantity}",
+						uriBuilder -> uriBuilder.build(itemId, itemQuantity))
+				.retrieve()
+				.toBodilessEntity()
+				.block();
+	}
+	
+	private void deleteQuantityItemFromStorage(int itemId) {
+		webClientBuilder
+				.build()
+				.delete()
+				.uri("http://storage-service/v1/api/storage/{itemId}",
+						uriBuilder -> uriBuilder.build(itemId))
+				.retrieve()
+				.toBodilessEntity()
+				.block();
 	}
 }

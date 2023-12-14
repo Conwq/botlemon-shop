@@ -57,7 +57,7 @@ public class CartService {
 		this.checkAvailableItemQuantity(itemId, quantity);
 
 		CartEntity cartEntity
-				= this.getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUser(userId, itemId, quantity);
+				= this.getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(userId, itemId, quantity);
 
 		//TODO может отправлять какой нибудь объект для запроса с данными? exchange Например DeleteRequest(int itemId, int quantity)
 		restTemplate.delete(
@@ -98,7 +98,7 @@ public class CartService {
 		return createResponse(Actions.REMOVE, HttpStatus.OK);
 	}
 
-	private CartEntity getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUser(int userId, int itemId, int quantity) {
+	private CartEntity getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(int userId, int itemId, int quantity) {
 		return cartRepository
 				.findByUserEntityIdAndItemEntityId(userId, itemId)
 				.map(cart -> {
