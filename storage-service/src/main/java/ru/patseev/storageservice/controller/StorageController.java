@@ -3,13 +3,13 @@ package ru.patseev.storageservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.patseev.storageservice.dto.StorageRequest;
 import ru.patseev.storageservice.service.StorageService;
 
 @RestController
 @RequestMapping("/v1/api/storage")
 @RequiredArgsConstructor
 public class StorageController {
-
 	private final StorageService storageService;
 
 	@GetMapping("/{itemId}")
@@ -17,16 +17,9 @@ public class StorageController {
 		return storageService.checkQuantityItemInStorage(itemId);
 	}
 
-	@PostMapping("/{itemId}/{quantity}")
-	public ResponseEntity<Object> addQuantityForItem(@PathVariable("itemId") int itemId,
-													 @PathVariable("quantity") int quantity) {
-		return storageService.addQuantityForItem(itemId, quantity);
-	}
-
-	@DeleteMapping("/{itemId}/{quantity}")
-	public void addItemQuantityToCart(@PathVariable("itemId") int itemId,
-									  @PathVariable("quantity") int quantity) {
-		storageService.addItemQuantityToCart(itemId, quantity);
+	@PostMapping
+	public ResponseEntity<Object> addQuantityForItem(@RequestBody StorageRequest request) {
+		return storageService.addQuantityForItem(request.itemId(), request.quantity());
 	}
 
 	@DeleteMapping("/{itemId}")
@@ -34,15 +27,18 @@ public class StorageController {
 		storageService.removeQuantityForItem(itemId);
 	}
 
-	@PutMapping("/{itemId}/{quantity}")
-	public void editItemQuantity(@PathVariable("itemId") int itemId,
-								 @PathVariable("quantity") int quantity) {
-		storageService.editItemQuantity(itemId, quantity);
+	@PutMapping("/edit")
+	public void editItemQuantity(@RequestBody StorageRequest request) {
+		storageService.editItemQuantity(request.itemId(), request.quantity());
 	}
 
-	@PutMapping("/return/{itemId}/{quantity}")
-	public void returnQuantityOfItemToStorage(@PathVariable("itemId") int itemId,
-											  @PathVariable("quantity") int quantity) {
-		storageService.returnQuantityOfItemToStorage(itemId, quantity);
+	@PutMapping("/return")
+	public void returnQuantityOfItemToStorage(@RequestBody StorageRequest request) {
+		storageService.returnQuantityOfItemToStorage(request.itemId(), request.quantity());
+	}
+
+	@PatchMapping
+	public void addItemQuantityToCart(@RequestBody StorageRequest request) {
+		storageService.addItemQuantityToCart(request.itemId(), request.quantity());
 	}
 }

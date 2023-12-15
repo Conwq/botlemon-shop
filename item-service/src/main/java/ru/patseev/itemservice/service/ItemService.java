@@ -10,6 +10,7 @@ import ru.patseev.itemservice.domain.ItemEntity;
 import ru.patseev.itemservice.dto.Actions;
 import ru.patseev.itemservice.dto.InfoResponse;
 import ru.patseev.itemservice.dto.ItemDto;
+import ru.patseev.itemservice.dto.StorageRequest;
 import ru.patseev.itemservice.exception.ItemNotFoundException;
 import ru.patseev.itemservice.mapper.ItemMapper;
 import ru.patseev.itemservice.repository.ItemRepository;
@@ -24,11 +25,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ItemService {
-
 	private final ItemRepository itemRepository;
-
 	private final ItemMapper itemMapper;
-
 	private final WebClient.Builder webClientBuilder;
 
 	@Transactional(readOnly = true)
@@ -79,16 +77,18 @@ public class ItemService {
 
 		this.deleteQuantityItemFromStorage(itemId);
 		itemRepository.deleteById(itemId);
-		
+
 		return createResponse(Actions.DELETE, HttpStatus.OK);
 	}
 
-	private ResponseEntity<InfoResponse> createResponse(Actions action, HttpStatus status) {
+	private ResponseEntity<InfoResponse> createResponse(Actions action,
+														HttpStatus status) {
 		InfoResponse infoResponse = new InfoResponse(action, status);
 		return new ResponseEntity<>(infoResponse, status);
 	}
 
-	private void updateItemField(ItemDto itemDto, ItemEntity itemEntity) {
+	private void updateItemField(ItemDto itemDto,
+								 ItemEntity itemEntity) {
 		final String name;
 		final String description;
 		final BigDecimal price;
@@ -111,8 +111,8 @@ public class ItemService {
 		webClientBuilder
 				.build()
 				.put()
-				.uri("http://storage-service/v1/api/storage/{itemId}/{quantity}",
-						uriBuilder -> uriBuilder.build(itemDto.getId(), itemDto.getQuantity()))
+				.uri("http://storage-service/v1/api/storage/edit")
+				.bodyValue(new StorageRequest(itemDto.getId(), itemDto.getQuantity()))
 				.retrieve()
 				.toBodilessEntity()
 				.block();
@@ -142,17 +142,18 @@ public class ItemService {
 		return itemEntity;
 	}
 
-	private void saveQuantityItemToStorage(int itemId, int itemQuantity) {
+	private void saveQuantityItemToStorage(int itemId,
+										   int itemQuantity) {
 		webClientBuilder
 				.build()
 				.post()
-				.uri("http://storage-service/v1/api/storage/{itemId}/{quantity}",
-						uriBuilder -> uriBuilder.build(itemId, itemQuantity))
+				.uri("http://storage-service/v1/api/storage")
+				.bodyValue(new StorageRequest(itemId, itemQuantity))
 				.retrieve()
 				.toBodilessEntity()
 				.block();
 	}
-	
+
 	private void deleteQuantityItemFromStorage(int itemId) {
 		webClientBuilder
 				.build()

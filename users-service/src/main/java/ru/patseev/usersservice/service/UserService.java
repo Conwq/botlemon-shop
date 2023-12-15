@@ -21,15 +21,11 @@ import java.time.Instant;
 @Service
 @RequiredArgsConstructor
 public class UserService {
-
 	private final UserRepository userRepository;
-
 	private final RoleRepository roleRepository;
-
 	private final UserMapper userMapper;
 
 	public UserDto registrationUser(UserDto userDto) {
-
 		this.checkUserExisted(userDto);
 		UserEntity userEntity = this.createUserEntity(userDto);
 
@@ -37,7 +33,6 @@ public class UserService {
 	}
 
 	public AuthorizationResponse authorizationUser(UserDto userDto) {
-
 		return userRepository
 				.findByUsername(userDto.getUsername())
 				.map(user -> {

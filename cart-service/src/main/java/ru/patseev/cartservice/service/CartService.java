@@ -5,14 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import ru.patseev.cartservice.domain.CartEntity;
 import ru.patseev.cartservice.domain.ItemEntity;
 import ru.patseev.cartservice.domain.UserEntity;
-import ru.patseev.cartservice.dto.Actions;
-import ru.patseev.cartservice.dto.CartRequest;
-import ru.patseev.cartservice.dto.InfoResponse;
-import ru.patseev.cartservice.dto.ItemDto;
+import ru.patseev.cartservice.dto.*;
 import ru.patseev.cartservice.exception.ItemNotFoundException;
 import ru.patseev.cartservice.exception.UnacceptableQualityItemsException;
 import ru.patseev.cartservice.exception.UserNotFoundException;
@@ -29,16 +26,11 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CartService {
-
 	private final UserRepository userRepository;
-
 	private final ItemRepository itemRepository;
-
 	private final CartRepository cartRepository;
-
 	private final ItemMapper itemMapper;
-
-	private final RestTemplate restTemplate;
+	private final WebClient.Builder webClientBuilder;
 
 	@Transactional(readOnly = true)
 	public List<ItemDto> getUserShoppingCart(int userId) {
@@ -52,53 +44,58 @@ public class CartService {
 	@Transactional
 	public ResponseEntity<InfoResponse> addItemToCart(int userId, CartRequest request) {
 		final int itemId = request.itemId();
-		final int quantity = request.quantity();
+		int quantity;
+
+		if ((quantity = request.quantity()) <= 0) {
+			return createResponse(Actions.ADD, HttpStatus.BAD_REQUEST);
+		}
 
 		this.checkAvailableItemQuantity(itemId, quantity);
 
 		CartEntity cartEntity
 				= this.getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(userId, itemId, quantity);
 
-		//TODO может отправлять какой нибудь объект для запроса с данными? exchange Например DeleteRequest(int itemId, int quantity)
-		restTemplate.delete(
-				"http://localhost:5013/v1/api/storage/{itemId}/{quantity}",
-				itemId,
-				quantity);
+		webClientBuilder
+				.build()
+				.patch()
+				.uri("http://storage-service/v1/api/storage")
+				.bodyValue(new StorageRequest(itemId, quantity))
+				.retrieve()
+				.toBodilessEntity()
+				.block();
 
 		cartRepository.save(cartEntity);
-
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
 	}
 
 	@Transactional
 	public ResponseEntity<InfoResponse> removeItemFromCart(int userId, CartRequest request) {
-		int requestQuantity = request.quantity();
-		int itemId = request.itemId();
-		CartEntity cartEntity = this.getCartEntityByUserIdAndItemId(userId, itemId);
-		int cartEntityQuantity = cartEntity.getQuantity();
+		int quantity;
+		CartEntity cartEntity = this.getCartEntityByUserIdAndItemId(userId, request.itemId());
 
-		if (cartEntityQuantity <= requestQuantity) {
-			restTemplate.put(
-					"http://localhost:5013/v1/api/storage/return/{itemId}/{quantity}",
-					null,
-					itemId,
-					cartEntityQuantity);
-
+		if (cartEntity.getQuantity() <= request.quantity()) {
+			quantity = cartEntity.getQuantity();
 			cartRepository.delete(cartEntity);
 		} else {
-			restTemplate.put(
-					"http://localhost:5013/v1/api/storage/return/{itemId}/{quantity}",
-					null,
-					itemId,
-					requestQuantity);
-
-			cartEntity.setQuantity(cartEntityQuantity - requestQuantity);
+			quantity = request.quantity();
+			cartEntity.setQuantity(cartEntity.getQuantity() - request.quantity());
 		}
+
+		webClientBuilder
+				.build()
+				.put()
+				.uri("http://storage-service/v1/api/storage/return")
+				.bodyValue(new StorageRequest(request.itemId(), quantity))
+				.retrieve()
+				.toBodilessEntity()
+				.block();
 
 		return createResponse(Actions.REMOVE, HttpStatus.OK);
 	}
 
-	private CartEntity getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(int userId, int itemId, int quantity) {
+	private CartEntity getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(int userId,
+																								 int itemId,
+																								 int quantity) {
 		return cartRepository
 				.findByUserEntityIdAndItemEntityId(userId, itemId)
 				.map(cart -> {
@@ -152,10 +149,15 @@ public class CartService {
 	}
 
 	private void checkAvailableItemQuantity(int itemId, int quantity) {
-		int itemQuantity = Objects.requireNonNull(restTemplate.getForObject(
-				"http://localhost:5013/v1/api/storage/{itemId}",
-				Integer.class,
-				itemId));
+		Integer itemQuantity = Objects.requireNonNull(
+				webClientBuilder
+						.build()
+						.get()
+						.uri("http://storage-service/v1/api/storage/{itemId}",
+								uriBuilder -> uriBuilder.build(itemId))
+						.retrieve()
+						.bodyToMono(Integer.class)
+						.block());
 
 		if (itemQuantity - quantity < 0) {
 			throw new UnacceptableQualityItemsException("Unacceptable quality of items");
