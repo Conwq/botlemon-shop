@@ -1,9 +1,16 @@
 server:
-  port: 501
+  port: 5010
 
 spring:
   application:
-    name: user-service
+    name: migration-database-service
+
+  flyway:
+    url: jdbc:postgresql://localhost:5432/botlemon_application
+    locations: classpath:db/migration
+    user: root
+    password: 1
+    default-schema: migration
 
   jpa:
     show-sql: false
@@ -21,8 +28,3 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: root
     password: 1
-
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
