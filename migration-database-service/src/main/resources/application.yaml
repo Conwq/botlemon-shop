@@ -1,6 +1,3 @@
-server:
-  port: 5010
-
 spring:
   application:
     name: migration-database-service

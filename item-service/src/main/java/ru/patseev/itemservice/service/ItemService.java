@@ -39,8 +39,7 @@ public class ItemService {
 
 	@Transactional(readOnly = true)
 	public List<ItemDto> getAllItems() {
-		return itemRepository
-				.findAll()
+		return itemRepository.findAll()
 				.stream()
 				.map(this::getItemWithQuantity)
 				.collect(Collectors.toList());
@@ -48,14 +47,22 @@ public class ItemService {
 
 	public ResponseEntity<InfoResponse> addItem(ItemDto itemDto) {
 		ItemEntity itemEntity = this.createItemEntity(itemDto);
-
-		int itemId = itemRepository
-				.save(itemEntity)
-				.getId();
-
+		int itemId = itemRepository.save(itemEntity).getId();
 		this.saveQuantityItemToStorage(itemId, itemDto.getQuantity());
 
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
+	}
+
+	@Transactional
+	public ResponseEntity<InfoResponse> deleteItem(int itemId) {
+		if (!itemRepository.existsById(itemId)) {
+			throw new ItemNotFoundException("Item not found");
+		}
+
+		this.deleteQuantityItemFromStorage(itemId);
+		itemRepository.deleteById(itemId);
+
+		return createResponse(Actions.DELETE, HttpStatus.OK);
 	}
 
 	@Transactional
@@ -71,26 +78,12 @@ public class ItemService {
 		return createResponse(Actions.EDIT, HttpStatus.OK);
 	}
 
-	@Transactional
-	public ResponseEntity<InfoResponse> deleteItem(int itemId) {
-		if (!itemRepository.existsById(itemId)) {
-			throw new ItemNotFoundException("Item not found");
-		}
-
-		this.deleteQuantityItemFromStorage(itemId);
-		itemRepository.deleteById(itemId);
-
-		return createResponse(Actions.DELETE, HttpStatus.OK);
-	}
-
-	private ResponseEntity<InfoResponse> createResponse(Actions action,
-														HttpStatus status) {
+	private ResponseEntity<InfoResponse> createResponse(Actions action, HttpStatus status) {
 		InfoResponse infoResponse = new InfoResponse(action, status);
 		return new ResponseEntity<>(infoResponse, status);
 	}
 
-	private void updateItemField(ItemDto itemDto,
-								 ItemEntity itemEntity) {
+	private void updateItemField(ItemDto itemDto, ItemEntity itemEntity) {
 		final String name;
 		final String description;
 		final BigDecimal price;
@@ -110,25 +103,28 @@ public class ItemService {
 	}
 
 	private void updateStorageQuantity(ItemDto itemDto) {
-		webClientBuilder
-				.build()
+		ResponseEntity<Object> response = webClientBuilder.build()
 				.put()
 				.uri("http://storage-service/v1/api/storage/edit")
 				.bodyValue(new StorageRequest(itemDto.getId(), itemDto.getQuantity()))
 				.retrieve()
-				.toBodilessEntity()
+				.toEntity(Object.class)
 				.block();
+
+		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
+			throw new ItemNotFoundException("Current item not found it storage");
+		}
 	}
 
 	private ItemDto getItemWithQuantity(ItemEntity itemEntity) {
-		Integer quantity = webClientBuilder
-				.build()
+		Integer quantity = webClientBuilder.build()
 				.get()
 				.uri("http://storage-service/v1/api/storage/{itemId}",
 						uriBuilder -> uriBuilder.build(itemEntity.getId()))
 				.retrieve()
 				.bodyToMono(Integer.class)
-				.block();
+				.blockOptional()
+				.orElseThrow(() -> new ItemNotFoundException("Current item not found"));
 
 		ItemDto itemDto = itemMapper.toDto(itemEntity);
 		itemDto.setQuantity(quantity);
@@ -144,26 +140,31 @@ public class ItemService {
 		return itemEntity;
 	}
 
-	private void saveQuantityItemToStorage(int itemId,
-										   int itemQuantity) {
-		webClientBuilder
-				.build()
+	private void saveQuantityItemToStorage(int itemId, int itemQuantity) {
+		ResponseEntity<Object> response = webClientBuilder.build()
 				.post()
 				.uri("http://storage-service/v1/api/storage")
 				.bodyValue(new StorageRequest(itemId, itemQuantity))
 				.retrieve()
-				.toBodilessEntity()
+				.toEntity(Object.class)
 				.block();
+
+		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
+			throw new ItemNotFoundException("Current item not found it storage");
+		}
 	}
 
 	private void deleteQuantityItemFromStorage(int itemId) {
-		webClientBuilder
-				.build()
+		ResponseEntity<Object> response = webClientBuilder.build()
 				.delete()
 				.uri("http://storage-service/v1/api/storage/{itemId}",
 						uriBuilder -> uriBuilder.build(itemId))
 				.retrieve()
-				.toBodilessEntity()
+				.toEntity(Object.class)
 				.block();
+
+		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
+			throw new ItemNotFoundException("Current item not found it storage");
+		}
 	}
 }

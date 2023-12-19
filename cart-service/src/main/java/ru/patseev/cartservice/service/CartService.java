@@ -55,13 +55,12 @@ public class CartService {
 		CartEntity cartEntity
 				= this.getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(userId, itemId, quantity);
 
-		webClientBuilder
-				.build()
+		ResponseEntity<Object> response = webClientBuilder.build()
 				.patch()
 				.uri("http://storage-service/v1/api/storage")
 				.bodyValue(new StorageRequest(itemId, quantity))
 				.retrieve()
-				.toBodilessEntity()
+				.toEntity(Object.class)
 				.block();
 
 		cartRepository.save(cartEntity);
@@ -81,21 +80,18 @@ public class CartService {
 			cartEntity.setQuantity(cartEntity.getQuantity() - request.quantity());
 		}
 
-		webClientBuilder
-				.build()
+		ResponseEntity<Object> response = webClientBuilder.build()
 				.put()
 				.uri("http://storage-service/v1/api/storage/return")
 				.bodyValue(new StorageRequest(request.itemId(), quantity))
 				.retrieve()
-				.toBodilessEntity()
+				.toEntity(Object.class)
 				.block();
 
 		return createResponse(Actions.REMOVE, HttpStatus.OK);
 	}
 
-	private CartEntity getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(int userId,
-																								 int itemId,
-																								 int quantity) {
+	private CartEntity getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(int userId, int itemId, int quantity) {
 		return cartRepository
 				.findByUserEntityIdAndItemEntityId(userId, itemId)
 				.map(cart -> {
@@ -135,8 +131,7 @@ public class CartService {
 	private CartEntity buildCartEntity(int userId, int itemId, int quantity) {
 		UserEntity userEntity = this.getUserEntityByUserId(userId);
 		ItemEntity itemEntity = this.getItemEntityByItemId(itemId);
-		CartEntity cartEntity = CartEntity
-				.builder()
+		CartEntity cartEntity = CartEntity.builder()
 				.userEntity(userEntity)
 				.itemEntity(itemEntity)
 				.quantity(quantity)
@@ -150,8 +145,7 @@ public class CartService {
 
 	private void checkAvailableItemQuantity(int itemId, int quantity) {
 		Integer itemQuantity = Objects.requireNonNull(
-				webClientBuilder
-						.build()
+				webClientBuilder.build()
 						.get()
 						.uri("http://storage-service/v1/api/storage/{itemId}",
 								uriBuilder -> uriBuilder.build(itemId))
