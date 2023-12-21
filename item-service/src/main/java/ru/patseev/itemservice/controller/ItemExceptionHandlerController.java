@@ -18,15 +18,7 @@ public class ItemExceptionHandlerController {
 	}
 
 	private ResponseEntity<ExceptionResponse> createExceptionResponse(RuntimeException e) {
-
-		HttpStatus notFound = HttpStatus.NOT_FOUND;
-
-		ExceptionResponse response = ExceptionResponse.builder()
-				.status(notFound)
-				.message(e.getMessage())
-				.createdAt(Instant.now().toString())
-				.build();
-
-		return new ResponseEntity<>(response, notFound);
+		ExceptionResponse response = new ExceptionResponse(HttpStatus.NOT_FOUND, e.getMessage(), Instant.now().toString());
+		return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 	}
 }

@@ -1,4 +1,4 @@
-package ru.patseev.itemservice.exception;
+package ru.patseev.reviewservice.exception;
 
 public class ItemNotFoundException extends RuntimeException {
 

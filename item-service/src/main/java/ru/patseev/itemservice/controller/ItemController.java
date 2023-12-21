@@ -13,7 +13,6 @@ import java.util.List;
 @RequestMapping("/v1/api/items")
 @RequiredArgsConstructor
 public class ItemController {
-
 	private final ItemService itemService;
 
 	@GetMapping("/{itemId}")

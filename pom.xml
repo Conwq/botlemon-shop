@@ -23,6 +23,7 @@
         <module>storage-service</module>
         <module>discovery-server</module>
         <module>migration-database-service</module>
+        <module>item-review-service</module>
     </modules>
 
     <properties>

@@ -18,29 +18,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ItemEntity {
-
 	@Id
 	@Column(name = "item_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
 	private String name;
-
 	private String description;
-
 	private BigDecimal price;
-
-	private BigDecimal rating;
-
-	private Integer voters;
-
 	private Timestamp publicationDate;
-
 	@OneToMany(mappedBy = "itemEntity",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)
 	private List<CartEntity> cartEntities;
-
 	public List<CartEntity> getCartEntities() {
 		if (cartEntities == null) {
 			return new ArrayList<>();

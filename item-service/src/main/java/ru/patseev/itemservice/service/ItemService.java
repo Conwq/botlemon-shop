@@ -34,7 +34,7 @@ public class ItemService {
 		return itemRepository
 				.findById(itemId)
 				.map(this::getItemWithQuantity)
-				.orElseThrow(() -> new ItemNotFoundException("Item not found"));
+				.orElseThrow(ItemNotFoundException::new);
 	}
 
 	@Transactional(readOnly = true)
@@ -55,9 +55,8 @@ public class ItemService {
 
 	@Transactional
 	public ResponseEntity<InfoResponse> deleteItem(int itemId) {
-		if (!itemRepository.existsById(itemId)) {
-			throw new ItemNotFoundException("Item not found");
-		}
+		itemRepository.findById(itemId)
+				.orElseThrow(ItemNotFoundException::new);
 
 		this.deleteQuantityItemFromStorage(itemId);
 		itemRepository.deleteById(itemId);
@@ -73,7 +72,7 @@ public class ItemService {
 					this.updateItemField(itemDto, itemEntity);
 					return itemRepository.save(itemEntity);
 				})
-				.orElseThrow(() -> new ItemNotFoundException("Item not found"));
+				.orElseThrow(ItemNotFoundException::new);
 
 		return createResponse(Actions.EDIT, HttpStatus.OK);
 	}
@@ -112,7 +111,7 @@ public class ItemService {
 				.block();
 
 		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
-			throw new ItemNotFoundException("Current item not found it storage");
+			throw new ItemNotFoundException();
 		}
 	}
 
@@ -124,7 +123,7 @@ public class ItemService {
 				.retrieve()
 				.bodyToMono(Integer.class)
 				.blockOptional()
-				.orElseThrow(() -> new ItemNotFoundException("Current item not found"));
+				.orElseThrow(ItemNotFoundException::new);
 
 		ItemDto itemDto = itemMapper.toDto(itemEntity);
 		itemDto.setQuantity(quantity);
@@ -133,10 +132,9 @@ public class ItemService {
 	}
 
 	private ItemEntity createItemEntity(ItemDto itemDto) {
+		//TODO Добавить эту часть в mapstruct
 		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
 		itemEntity.setPublicationDate(Timestamp.from(Instant.now()));
-		itemEntity.setRating(new BigDecimal("0.0"));
-		itemEntity.setVoters(0);
 		return itemEntity;
 	}
 
@@ -150,7 +148,7 @@ public class ItemService {
 				.block();
 
 		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
-			throw new ItemNotFoundException("Current item not found it storage");
+			throw new ItemNotFoundException();
 		}
 	}
 
@@ -164,7 +162,7 @@ public class ItemService {
 				.block();
 
 		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
-			throw new ItemNotFoundException("Current item not found it storage");
+			throw new ItemNotFoundException();
 		}
 	}
 }

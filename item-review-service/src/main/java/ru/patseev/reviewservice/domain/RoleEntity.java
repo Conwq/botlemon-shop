@@ -1,11 +1,10 @@
-package ru.patseev.cartservice.domain;
+package ru.patseev.reviewservice.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ru.patseev.cartservice.dto.UserRoles;
 
 @Entity
 @Table(schema = "botlemon", name = "roles")

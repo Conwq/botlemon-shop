@@ -1,4 +1,4 @@
-package ru.patseev.storageservice.domain;
+package ru.patseev.reviewservice.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(schema = "botlemon", name = "items")
@@ -24,6 +26,13 @@ public class ItemEntity {
 	private String description;
 	private BigDecimal price;
 	private Timestamp publicationDate;
-	@OneToOne(mappedBy = "item", fetch = FetchType.LAZY)
-	private StorageEntity storage;
+	@OneToMany(mappedBy = "itemEntity", fetch = FetchType.LAZY)
+	private List<ReviewEntity> reviewEntityList;
+
+	public void addReviewEntity(ReviewEntity reviewEntity) {
+		if (reviewEntityList == null) {
+			reviewEntityList = new ArrayList<>();
+		}
+		reviewEntityList.add(reviewEntity);
+	}
 }

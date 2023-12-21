@@ -1,4 +1,4 @@
-package ru.patseev.itemservice.dto;
+package ru.patseev.reviewservice.dto;
 
 import org.springframework.http.HttpStatus;
 
