@@ -20,7 +20,7 @@ public class ItemController {
 		return itemService.getItemById(itemId);
 	}
 
-	@GetMapping("")
+	@GetMapping
 	public List<ItemDto> getItemsList() {
 		return itemService.getAllItems();
 	}
@@ -35,8 +35,8 @@ public class ItemController {
 		return itemService.editItem(itemDto);
 	}
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<InfoResponse> deleteItem(@PathVariable("id") int id) {
+	@DeleteMapping("/{itemId}")
+	public ResponseEntity<InfoResponse> deleteItem(@PathVariable("itemId") int id) {
 		return itemService.deleteItem(id);
 	}
 }

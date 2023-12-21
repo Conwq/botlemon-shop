@@ -100,7 +100,7 @@ public class ReviewServiceImpl implements ReviewService {
 		return this.createResponse(Actions.EDIT_REVIEW, HttpStatus.OK);
 	}
 
-	public ReviewEntity createReviewEntity(ItemEntity itemEntity, UserEntity userEntity, FeedbackRequest request) {
+	private ReviewEntity createReviewEntity(ItemEntity itemEntity, UserEntity userEntity, FeedbackRequest request) {
 		ReviewEntity reviewEntity = ReviewEntity.builder()
 				.itemEntity(itemEntity)
 				.userEntity(userEntity)
