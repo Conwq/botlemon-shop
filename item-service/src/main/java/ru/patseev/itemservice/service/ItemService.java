@@ -5,12 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.reactive.function.client.WebClient;
+import ru.patseev.itemservice.client.StorageServiceClient;
 import ru.patseev.itemservice.domain.ItemEntity;
 import ru.patseev.itemservice.dto.Actions;
 import ru.patseev.itemservice.dto.InfoResponse;
 import ru.patseev.itemservice.dto.ItemDto;
-import ru.patseev.itemservice.dto.StorageRequest;
 import ru.patseev.itemservice.exception.ItemNotFoundException;
 import ru.patseev.itemservice.mapper.ItemMapper;
 import ru.patseev.itemservice.repository.ItemRepository;
@@ -20,20 +19,19 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class ItemService {
 	private final ItemRepository itemRepository;
 	private final ItemMapper itemMapper;
-	private final WebClient.Builder webClientBuilder;
+	private final StorageServiceClient storageServiceClient;
 
 	@Transactional(readOnly = true)
 	public ItemDto getItemById(int itemId) {
 		return itemRepository
 				.findById(itemId)
-				.map(this::getItemWithQuantity)
+				.map(this::mapItemEntityToItemDtoWithQuantity)
 				.orElseThrow(ItemNotFoundException::new);
 	}
 
@@ -41,14 +39,15 @@ public class ItemService {
 	public List<ItemDto> getAllItems() {
 		return itemRepository.findAll()
 				.stream()
-				.map(this::getItemWithQuantity)
-				.collect(Collectors.toList());
+				.map(this::mapItemEntityToItemDtoWithQuantity)
+				.toList();
 	}
 
 	public ResponseEntity<InfoResponse> addItem(ItemDto itemDto) {
 		ItemEntity itemEntity = this.createItemEntity(itemDto);
 		int itemId = itemRepository.save(itemEntity).getId();
-		this.saveQuantityItemToStorage(itemId, itemDto.getQuantity());
+
+		storageServiceClient.saveQuantityItemToStorage(itemId, itemDto.getQuantity());
 
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
 	}
@@ -58,7 +57,7 @@ public class ItemService {
 		itemRepository.findById(itemId)
 				.orElseThrow(ItemNotFoundException::new);
 
-		this.deleteQuantityItemFromStorage(itemId);
+		storageServiceClient.deleteQuantityItemFromStorage(itemId);
 		itemRepository.deleteById(itemId);
 
 		return createResponse(Actions.DELETE, HttpStatus.OK);
@@ -97,72 +96,20 @@ public class ItemService {
 			itemEntity.setPrice(price);
 		}
 		if (Objects.nonNull(itemDto.getQuantity())) {
-			this.updateStorageQuantity(itemDto);
+			storageServiceClient.updateStorageQuantity(itemDto);
 		}
 	}
 
-	private void updateStorageQuantity(ItemDto itemDto) {
-		ResponseEntity<Object> response = webClientBuilder.build()
-				.put()
-				.uri("http://storage-service/v1/api/storage/edit")
-				.bodyValue(new StorageRequest(itemDto.getId(), itemDto.getQuantity()))
-				.retrieve()
-				.toEntity(Object.class)
-				.block();
-
-		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
-			throw new ItemNotFoundException();
-		}
-	}
-
-	private ItemDto getItemWithQuantity(ItemEntity itemEntity) {
-		Integer quantity = webClientBuilder.build()
-				.get()
-				.uri("http://storage-service/v1/api/storage/{itemId}",
-						uriBuilder -> uriBuilder.build(itemEntity.getId()))
-				.retrieve()
-				.bodyToMono(Integer.class)
-				.blockOptional()
-				.orElseThrow(ItemNotFoundException::new);
-
+	private ItemDto mapItemEntityToItemDtoWithQuantity(ItemEntity itemEntity) {
+		int quantityItem = storageServiceClient.getQuantityItem(itemEntity.getId());
 		ItemDto itemDto = itemMapper.toDto(itemEntity);
-		itemDto.setQuantity(quantity);
-
+		itemDto.setQuantity(quantityItem);
 		return itemDto;
 	}
 
 	private ItemEntity createItemEntity(ItemDto itemDto) {
-		//TODO Добавить эту часть в mapstruct
 		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
 		itemEntity.setPublicationDate(Timestamp.from(Instant.now()));
 		return itemEntity;
-	}
-
-	private void saveQuantityItemToStorage(int itemId, int itemQuantity) {
-		ResponseEntity<Object> response = webClientBuilder.build()
-				.post()
-				.uri("http://storage-service/v1/api/storage")
-				.bodyValue(new StorageRequest(itemId, itemQuantity))
-				.retrieve()
-				.toEntity(Object.class)
-				.block();
-
-		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
-			throw new ItemNotFoundException();
-		}
-	}
-
-	private void deleteQuantityItemFromStorage(int itemId) {
-		ResponseEntity<Object> response = webClientBuilder.build()
-				.delete()
-				.uri("http://storage-service/v1/api/storage/{itemId}",
-						uriBuilder -> uriBuilder.build(itemId))
-				.retrieve()
-				.toEntity(Object.class)
-				.block();
-
-		if (Objects.requireNonNull(response).getStatusCode().is4xxClientError()) {
-			throw new ItemNotFoundException();
-		}
 	}
 }

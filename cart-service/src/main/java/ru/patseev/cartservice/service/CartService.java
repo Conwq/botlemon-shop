@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import ru.patseev.cartservice.client.StorageServiceClient;
 import ru.patseev.cartservice.domain.CartEntity;
 import ru.patseev.cartservice.domain.ItemEntity;
 import ru.patseev.cartservice.domain.UserEntity;
@@ -30,7 +31,7 @@ public class CartService {
 	private final ItemRepository itemRepository;
 	private final CartRepository cartRepository;
 	private final ItemMapper itemMapper;
-	private final WebClient.Builder webClientBuilder;
+	private final StorageServiceClient storageServiceClient;
 
 	@Transactional(readOnly = true)
 	public List<ItemDto> getUserShoppingCart(int userId) {
@@ -50,19 +51,14 @@ public class CartService {
 			return createResponse(Actions.ADD, HttpStatus.BAD_REQUEST);
 		}
 
-		this.checkAvailableItemQuantity(itemId, quantity);
+		storageServiceClient.checkAvailableItemQuantity(itemId, quantity);
 
 		CartEntity cartEntity
 				= this.getCartEntityFromRepositoryByUserIdAndItemIdOrCreateNewUserIfUserNotExist(userId, itemId, quantity);
 
 		//TODO
-		ResponseEntity<Object> response = webClientBuilder.build()
-				.patch()
-				.uri("http://storage-service/v1/api/storage")
-				.bodyValue(new StorageRequest(itemId, quantity))
-				.retrieve()
-				.toEntity(Object.class)
-				.block();
+		ResponseEntity<Object> response
+				= storageServiceClient.addItemQuantityToCart(itemId, quantity);
 
 		cartRepository.save(cartEntity);
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
@@ -81,13 +77,9 @@ public class CartService {
 			cartEntity.setQuantity(cartEntity.getQuantity() - request.quantity());
 		}
 
-		ResponseEntity<Object> response = webClientBuilder.build()
-				.put()
-				.uri("http://storage-service/v1/api/storage/return")
-				.bodyValue(new StorageRequest(request.itemId(), quantity))
-				.retrieve()
-				.toEntity(Object.class)
-				.block();
+		//TODO
+		ResponseEntity<Object> response
+				= storageServiceClient.returnQuantityOfItemToStorage(request.itemId(), quantity);
 
 		return createResponse(Actions.REMOVE, HttpStatus.OK);
 	}
@@ -142,21 +134,6 @@ public class CartService {
 		itemEntity.getCartEntities().add(cartEntity);
 
 		return cartEntity;
-	}
-
-	private void checkAvailableItemQuantity(int itemId, int quantity) {
-		Integer itemQuantity = Objects.requireNonNull(
-				webClientBuilder.build()
-						.get()
-						.uri("http://storage-service/v1/api/storage/{itemId}",
-								uriBuilder -> uriBuilder.build(itemId))
-						.retrieve()
-						.bodyToMono(Integer.class)
-						.block());
-
-		if (itemQuantity - quantity < 0) {
-			throw new UnacceptableQualityItemsException("Unacceptable quality of items");
-		}
 	}
 
 	private ResponseEntity<InfoResponse> createResponse(Actions action, HttpStatus status) {
