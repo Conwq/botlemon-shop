@@ -32,6 +32,10 @@ public class RoutingConfiguration {
 						p -> p.path("/v1/api/review/**")
 								.uri("lb://items-reviews-service")
 				)
+				.route("authentication-service",
+						p -> p.path("/v1/api/auth/**")
+								.uri("lb://authentication-service")
+				)
 				.route("discovery-server",
 						p -> p.path("/eureka/web")
 								.filters(f -> f.setPath("/"))

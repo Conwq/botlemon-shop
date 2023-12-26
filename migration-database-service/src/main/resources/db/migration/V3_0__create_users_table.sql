@@ -2,7 +2,7 @@ CREATE TABLE botlemon.users
 (
     user_id         SERIAL PRIMARY KEY,
     username        VARCHAR(30) NOT NULL UNIQUE,
-    password        VARCHAR(30) NOT NULL,
+    password        VARCHAR(100) NOT NULL,
     first_name      VARCHAR(30) NOT NULL,
     last_name       VARCHAR(30) NOT NULL,
     enabled         BOOLEAN   DEFAULT FALSE,
@@ -11,4 +11,4 @@ CREATE TABLE botlemon.users
 );
 
 INSERT INTO botlemon.users(username, password, first_name, last_name, role_id)
-VALUES ('a', 'a', 'a', 'a', 1);
+VALUES ('a', '$2a$10$lROYPWShj1vIGfnvXDlJOe8cBOnowm6d2Mb4p5xNDddbziNjhJbIa', 'a', 'a', 1);
