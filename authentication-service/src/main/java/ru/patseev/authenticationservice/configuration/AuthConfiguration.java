@@ -15,22 +15,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import ru.patseev.authenticationservice.filter.JwtAuthenticationFilter;
 import ru.patseev.authenticationservice.repository.UserCredentialRepository;
-import ru.patseev.authenticationservice.service.JwtService;
 
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class AuthConfiguration {
 	private final UserCredentialRepository userCredentialRepository;
-	private final JwtService jwtService;
-
-	@Bean
-	public JwtAuthenticationFilter jwtAuthenticationFilter() {
-		return new JwtAuthenticationFilter(jwtService, userDetailsService());
-	}
+	private final String AUTHENTICATION_PATH = "/v1/api/auth/authorization";
+	private final String REGISTRATION_PATH = "/v1/api/auth/register";
 
 	@Bean
 	public UserDetailsService userDetailsService() {
@@ -60,13 +53,9 @@ public class AuthConfiguration {
 		return httpSecurity
 				.csrf(AbstractHttpConfigurer::disable)
 				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/v1/api/auth/register", "/v1/api/auth/authorization")
-						.permitAll()
-						.anyRequest()
-						.authenticated())
-				.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authenticationProvider(authenticationProvider())
-				.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+								.anyRequest()
+								.permitAll()
+				)
 				.build();
 	}
 }
