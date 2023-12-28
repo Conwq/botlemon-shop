@@ -12,18 +12,21 @@ import java.util.function.Predicate;
 @Component
 @RequiredArgsConstructor
 public class RouteValidator {
-	private final Set<String> adminRole = Set.of("ADMIN");
-	private final Set<String> allRoles = Set.of("USER", "ADMIN");
+	private static final Set<String> ADMIN_ROLE = Set.of("ADMIN");
+	private static final Set<String> ALL_ROLES = Set.of("USER", "ADMIN");
 
 	public final List<String> openApiEndpoints = List.of(
-			"/v1/api/auth/register",
-			"/v1/api/auth/authorization",
-			"/v1/api/auth/activate"
+			"/v1/api/items/all_items",
+			"/v1/api/items/item"
 	);
 
 	public final Map<String, Set<String>> closeApiEndpoints = Map.of(
-			"/v1/api/auth/admin", adminRole,
-			"/v1/api/auth/all", allRoles
+
+			"/v1/api/items/add", ADMIN_ROLE,
+			"/v1/api/items/edit", ADMIN_ROLE,
+			"/v1/api/items/delete", ADMIN_ROLE
+
+			//
 	);
 
 	public Predicate<ServerHttpRequest> isSecured =

@@ -43,6 +43,7 @@ public class ItemService {
 				.toList();
 	}
 
+	//TODO transactional
 	public ResponseEntity<InfoResponse> addItem(ItemDto itemDto) {
 		ItemEntity itemEntity = this.createItemEntity(itemDto);
 		int itemId = itemRepository.save(itemEntity).getId();

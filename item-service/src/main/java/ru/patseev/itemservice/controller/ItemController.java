@@ -15,12 +15,12 @@ import java.util.List;
 public class ItemController {
 	private final ItemService itemService;
 
-	@GetMapping("/{itemId}")
+	@GetMapping("/item/{itemId}")
 	public ItemDto getItem(@PathVariable("itemId") int itemId) {
 		return itemService.getItemById(itemId);
 	}
 
-	@GetMapping
+	@GetMapping("/all_items")
 	public List<ItemDto> getItemsList() {
 		return itemService.getAllItems();
 	}
@@ -35,7 +35,7 @@ public class ItemController {
 		return itemService.editItem(itemDto);
 	}
 
-	@DeleteMapping("/{itemId}")
+	@DeleteMapping("/delete/{itemId}")
 	public ResponseEntity<InfoResponse> deleteItem(@PathVariable("itemId") int id) {
 		return itemService.deleteItem(id);
 	}

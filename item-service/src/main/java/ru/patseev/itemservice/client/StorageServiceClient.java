@@ -18,7 +18,7 @@ public class StorageServiceClient {
 	public void updateStorageQuantity(ItemDto itemDto) {
 		ResponseEntity<Object> response = webClientBuilder.build()
 				.put()
-				.uri("http://storage-service/v1/api/storage/edit")
+				.uri("lb://storage-service/v1/api/storage/edit")
 				.bodyValue(new StorageRequest(itemDto.getId(), itemDto.getQuantity()))
 				.retrieve()
 				.toEntity(Object.class)

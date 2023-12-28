@@ -19,37 +19,39 @@ import java.util.Set;
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter implements GatewayFilter {
-	private final RouteValidator routeValidator;
-	private final JwtService jwtService;
 
+	/**
+	 * В данном фильтре мне нужно фильтровать? Ничего.
+	 * Все ендпоинты должны быть доступны только для неавторизованного пользователя
+	 *
+	 * @param exchange
+	 * @param chain
+	 * @return
+	 */
 	@Override
 	public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
 		ServerHttpRequest request = exchange.getRequest();
 
-		if (routeValidator.isSecured.test(request)) {
-			if (this.authHeaderMissing(request)) {
-				return onError(exchange, HttpStatus.UNAUTHORIZED);
-			}
-
-			final String token = this.getTokenFromRequest(request);
-
-			if (jwtService.isTokenExpired(token)) {
-				return onError(exchange, HttpStatus.UNAUTHORIZED);
-			}
-
-			if (!this.accessAllowed(request, token)) {
-				return onError(exchange, HttpStatus.NOT_ACCEPTABLE);
-			}
+		if (this.authHeaderPresent(request)) {
+			return onError(exchange, HttpStatus.FORBIDDEN);
 		}
+//
+//		if (routeValidator.isSecured.test(request)) {
+//			if (this.authHeaderMissing(request)) {
+//				return onError(exchange, HttpStatus.UNAUTHORIZED);
+//			}
+//
+//			final String token = this.getTokenFromRequest(request);
+//
+//			if (jwtService.isTokenExpired(token)) {
+//				return onError(exchange, HttpStatus.UNAUTHORIZED);
+//			}
+//
+//			if (!this.accessAllowed(request, token)) {
+//				return onError(exchange, HttpStatus.NOT_ACCEPTABLE);
+//			}
+//		}
 		return chain.filter(exchange);
-	}
-
-	private boolean accessAllowed(ServerHttpRequest request, String token) {
-		String userRole = jwtService.extractUserRole(token);
-		String path = request.getURI().getPath();
-
-		Set<String> accessRoles = routeValidator.closeApiEndpoints.getOrDefault(path, Collections.emptySet());
-		return accessRoles.contains(userRole);
 	}
 
 	private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {
@@ -58,17 +60,8 @@ public class AuthenticationFilter implements GatewayFilter {
 		return response.setComplete();
 	}
 
-	private boolean authHeaderMissing(ServerHttpRequest request) {
-		return !request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION) ||
-				!request.getHeaders().getOrEmpty(HttpHeaders.AUTHORIZATION).get(0).startsWith("Bearer ");
-	}
-
-	private String getTokenFromRequest(ServerHttpRequest request) {
-		String bearer = request
-				.getHeaders()
-				.getOrEmpty(HttpHeaders.AUTHORIZATION)
-				.get(0);
-
-		return bearer.substring(7);
+	private boolean authHeaderPresent(ServerHttpRequest request) {
+		return request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION) &&
+				request.getHeaders().getOrEmpty(HttpHeaders.AUTHORIZATION).get(0).startsWith("Bearer ");
 	}
 }

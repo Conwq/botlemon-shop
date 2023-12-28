@@ -6,11 +6,13 @@ import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import ru.patseev.apigateway.filter.AuthenticationFilter;
+import ru.patseev.apigateway.filter.ItemServiceFilter;
 
 @Configuration
 @RequiredArgsConstructor
 public class RoutingConfiguration {
 	private final AuthenticationFilter authenticationFilter;
+	private final ItemServiceFilter itemServiceFilter;
 
 	@Bean
 	public RouteLocator rotes(RouteLocatorBuilder builder) {
@@ -18,6 +20,7 @@ public class RoutingConfiguration {
 				.routes()
 				.route("item-service",
 						p -> p.path("/v1/api/items/**")
+								.filters(f -> f.filter(itemServiceFilter))
 								.uri("lb://item-service")
 				)
 //				.route("cart-service",
