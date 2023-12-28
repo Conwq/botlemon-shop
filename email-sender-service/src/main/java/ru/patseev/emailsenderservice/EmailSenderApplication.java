@@ -1,12 +1,12 @@
-package ru.patseev.apigateway;
+package ru.patseev.emailsenderservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class ApiGatewayApplication {
+public class EmailSenderApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ApiGatewayApplication.class, args);
+		SpringApplication.run(EmailSenderApplication.class, args);
 	}
 }

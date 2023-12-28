@@ -17,28 +17,20 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {
-
 	@Id
 	@Column(name = "user_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
+	private String email;
 	private String username;
-
 	private String password;
-
 	private String firstName;
-
 	private String lastName;
-
 	private boolean enabled;
-
 	private Timestamp registrationAt;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "role_id")
 	private RoleEntity roleEntity;
-
 	@OneToMany(mappedBy = "userEntity",
 			cascade = CascadeType.ALL,
 			orphanRemoval = true)

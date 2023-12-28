@@ -29,7 +29,7 @@ public class JwtService {
 	}
 
 	public int extractUserId(String token) {
-		return extractClaim(token, claim -> claim.get("id", Integer.class));
+		return extractClaim(token, claim -> claim.get("userId", Integer.class));
 	}
 
 	public String extractUsername(String token) {

@@ -13,15 +13,12 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(schema = "botlemon", name = "storage")
 public class StorageEntity {
-
 	@Id
 	@Column(name = "storage_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
 	private ItemEntity item;
-
 	private Integer quantity;
 }

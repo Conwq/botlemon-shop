@@ -41,6 +41,10 @@ public class RoutingConfiguration {
 								.filters(f -> f.filter(authenticationFilter))
 								.uri("lb://authentication-service")
 				)
+				.route("email-sender-service",
+						p -> p.path("/v1/api/email/**")
+								.uri("lb://email-sender-service")
+				)
 //				.route("discovery-server",
 //						p -> p.path("/eureka/web")
 //								.filters(f -> f.setPath("/"))

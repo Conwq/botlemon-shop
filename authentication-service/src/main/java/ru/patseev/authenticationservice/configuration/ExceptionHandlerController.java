@@ -12,6 +12,6 @@ public class ExceptionHandlerController {
 
 	@ExceptionHandler(UserAlreadyExistException.class)
 	public ResponseEntity<ExceptionResponse> userAlreadyExistExceptionHandler(UserAlreadyExistException e) {
-		return new ResponseEntity<>(new ExceptionResponse("Current user exist"), HttpStatus.CONFLICT);
+		return new ResponseEntity<>(new ExceptionResponse(e.getMessage()), HttpStatus.CONFLICT);
 	}
 }

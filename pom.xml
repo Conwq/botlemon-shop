@@ -26,6 +26,7 @@
         <module>item-review-service</module>
         <module>api-gateway</module>
         <module>authentication-service</module>
+        <module>email-sender-service</module>
     </modules>
 
     <properties>

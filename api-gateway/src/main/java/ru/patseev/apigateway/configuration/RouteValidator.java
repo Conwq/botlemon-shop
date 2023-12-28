@@ -17,7 +17,8 @@ public class RouteValidator {
 
 	public final List<String> openApiEndpoints = List.of(
 			"/v1/api/auth/register",
-			"/v1/api/auth/authorization"
+			"/v1/api/auth/authorization",
+			"/v1/api/auth/activate"
 	);
 
 	public final Map<String, Set<String>> closeApiEndpoints = Map.of(

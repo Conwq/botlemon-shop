@@ -15,18 +15,19 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserCredential {
+public class UserEntity {
 	@Id
 	@Column(name = "user_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-//	private String email;
+	private String email;
 	private String username;
 	private String password;
 	private String firstName;
 	private String lastName;
 	private boolean enabled;
 	private Timestamp registrationAt;
+	private String activationCode;
 	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private Role role;

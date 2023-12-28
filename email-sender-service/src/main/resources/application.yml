@@ -1,0 +1,11 @@
+server:
+  port: 5018
+
+spring:
+  application:
+    name: email-sender-service
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/

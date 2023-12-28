@@ -13,19 +13,15 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CartEntity {
-
 	@Id
 	@Column(name = "cart_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private UserEntity userEntity;
-
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "item_id")
 	private ItemEntity itemEntity;
-
 	private Integer quantity;
 }
