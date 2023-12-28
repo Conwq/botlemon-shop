@@ -8,12 +8,21 @@ import org.springframework.context.annotation.Configuration;
 import ru.patseev.apigateway.filter.AuthenticationFilter;
 import ru.patseev.apigateway.filter.ItemServiceFilter;
 
+/**
+ * Конфигурационный класс предназначенный для настройки маршрутизации конечных точек.
+ */
 @Configuration
 @RequiredArgsConstructor
 public class RoutingConfiguration {
 	private final AuthenticationFilter authenticationFilter;
 	private final ItemServiceFilter itemServiceFilter;
 
+	/**
+	 * Создает и настраивает маршруты для различных сервисов с использованием фильтров и без них.
+	 *
+	 * @param builder Построитель маршрутов.
+	 * @return Объект RouteLocator - обработчик маршрутов.
+	 */
 	@Bean
 	public RouteLocator rotes(RouteLocatorBuilder builder) {
 		return builder

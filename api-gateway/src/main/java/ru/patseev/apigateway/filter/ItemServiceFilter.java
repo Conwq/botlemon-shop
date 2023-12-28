@@ -13,6 +13,8 @@ import reactor.core.publisher.Mono;
 import ru.patseev.apigateway.configuration.RouteValidator;
 import ru.patseev.apigateway.service.JwtService;
 
+import java.util.function.Predicate;
+
 @Component
 @RequiredArgsConstructor
 public class ItemServiceFilter implements GatewayFilter {
@@ -41,11 +43,9 @@ public class ItemServiceFilter implements GatewayFilter {
 		String userRole = jwtService.extractUserRole(token);
 		String path = request.getURI().getPath();
 
-		return routeValidator.closeApiEndpoints
-				.entrySet()
-				.stream()
-				.filter(entry -> path.startsWith(entry.getKey()))
-				.anyMatch(entry -> entry.getValue().contains(userRole));
+		Predicate<String> isAccessAllowed = routeValidator.createAccessCheckPredicate.apply(userRole);
+
+		return isAccessAllowed.test(path);
 	}
 
 	private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {

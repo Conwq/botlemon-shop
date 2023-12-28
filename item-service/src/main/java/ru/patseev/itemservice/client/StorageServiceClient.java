@@ -32,7 +32,7 @@ public class StorageServiceClient {
 	public int getQuantityItem(int itemId) {
 		return webClientBuilder.build()
 				.get()
-				.uri("http://storage-service/v1/api/storage/{itemId}",
+				.uri("lb://storage-service/v1/api/storage/{itemId}",
 						uriBuilder -> uriBuilder.build(itemId))
 				.retrieve()
 				.bodyToMono(Integer.class)
@@ -43,7 +43,7 @@ public class StorageServiceClient {
 	public void saveQuantityItemToStorage(int itemId, int itemQuantity) {
 		ResponseEntity<Object> response = webClientBuilder.build()
 				.post()
-				.uri("http://storage-service/v1/api/storage")
+				.uri("lb://storage-service/v1/api/storage")
 				.bodyValue(new StorageRequest(itemId, itemQuantity))
 				.retrieve()
 				.toEntity(Object.class)
@@ -57,7 +57,7 @@ public class StorageServiceClient {
 	public void deleteQuantityItemFromStorage(int itemId) {
 		ResponseEntity<Object> response = webClientBuilder.build()
 				.delete()
-				.uri("http://storage-service/v1/api/storage/{itemId}",
+				.uri("lb://storage-service/v1/api/storage/{itemId}",
 						uriBuilder -> uriBuilder.build(itemId))
 				.retrieve()
 				.toEntity(Object.class)
