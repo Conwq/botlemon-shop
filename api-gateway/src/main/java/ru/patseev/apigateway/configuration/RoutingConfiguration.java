@@ -45,10 +45,12 @@ public class RoutingConfiguration {
 								.filters(f -> f.filter(jwtAuthenticationFilter))
 								.uri("lb://storage-service")
 				)
-//				.route("items-reviews-service",
-//						p -> p.path("/v1/api/review/**")
-//								.uri("lb://items-reviews-service")
-//				)
+				//port 5015
+				.route("items-reviews-service",
+						p -> p.path("/v1/api/review/**")
+								.filters(f -> f.filter(jwtAuthenticationFilter))
+								.uri("lb://items-reviews-service")
+				)
 				//port 5017
 				.route("authentication-service",
 						p -> p.path("/v1/api/auth/**")
@@ -60,15 +62,16 @@ public class RoutingConfiguration {
 						p -> p.path("/v1/api/email/**")
 								.uri("lb://email-sender-service")
 				)
-//				.route("discovery-server",
-//						p -> p.path("/eureka/web")
-//								.filters(f -> f.setPath("/"))
-//								.uri("http://localhost:8761")
-//				)
-//				.route("discovery-server-static",
-//						p -> p.path("/eureka/**")
-//								.uri("http://localhost:8761")
-//				)
+				//port 8761
+				.route("discovery-server",
+						p -> p.path("/eureka/web")
+								.filters(f -> f.setPath("/"))
+								.uri("http://localhost:8761")
+				)
+				.route("discovery-server-static",
+						p -> p.path("/eureka/**")
+								.uri("http://localhost:8761")
+				)
 				.build();
 	}
 }

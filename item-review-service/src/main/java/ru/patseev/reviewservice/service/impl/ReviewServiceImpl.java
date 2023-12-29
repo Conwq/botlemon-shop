@@ -52,7 +52,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<InfoResponse> addReviewAndRatingForItemFromUser(int userId, FeedbackRequest request) {
+	public ResponseEntity<InfoResponse> addReviewForItem(int userId, FeedbackRequest request) {
 		ItemEntity itemEntity = itemRepository
 				.findById(request.id())
 				.orElseThrow(ItemNotFoundException::new);
@@ -69,7 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ReviewResponse> getAllReviewAndRatingForItemFromUsers(int itemId) {
+	public List<ReviewResponse> getAllReviewsForItem(int itemId) {
 		return itemRepository
 				.findById(itemId)
 				.orElseThrow(ItemNotFoundException::new)
@@ -81,7 +81,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<ReviewResponse> getAllReviewAndRatingFromUserByUserId(int userId) {
+	public List<ReviewResponse> getAllReviewsFromSpecificUser(int userId) {
 		return userRepository
 				.findById(userId)
 				.orElseThrow(UserNotFoundException::new)
@@ -93,7 +93,7 @@ public class ReviewServiceImpl implements ReviewService {
 
 	@Override
 	@Transactional
-	public ResponseEntity<InfoResponse> editReviewAndRatingForItem(int userId, FeedbackRequest request) {
+	public ResponseEntity<InfoResponse> editReviewForItem(int userId, FeedbackRequest request) {
 		ReviewEntity reviewEntity = this.editFieldReviewEntity(userId, request);
 		reviewRepository.save(reviewEntity);
 
@@ -136,7 +136,7 @@ public class ReviewServiceImpl implements ReviewService {
 		Integer reviewUserId = reviewEntity.getUserEntity().getId();
 
 		if (userId != reviewUserId) {
-			throw new UserMismatchException();
+			throw new UserMismatchException("User cannot change comments of other users");
 		}
 
 		if (Objects.nonNull(request.review())) {

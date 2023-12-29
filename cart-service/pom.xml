@@ -52,7 +52,6 @@
         <dependency>
             <groupId>ru.patseev</groupId>
             <artifactId>jwt-service-spring-boot-starter</artifactId>
-            <version>1.0</version>
         </dependency>
     </dependencies>
 

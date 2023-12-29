@@ -33,6 +33,7 @@
         <lombok.version>1.18.30</lombok.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <spring-cloud.version>2023.0.0</spring-cloud.version>
+        <jwt-service.version>1.0</jwt-service.version>
     </properties>
 
     <dependencyManagement>
@@ -55,6 +56,11 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>ru.patseev</groupId>
+                <artifactId>jwt-service-spring-boot-starter</artifactId>
+                <version>${jwt-service.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

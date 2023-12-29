@@ -31,7 +31,12 @@ public class RouteValidator {
 
 			//Item service
 			"/v1/api/items/all_items",
-			"/v1/api/items/item"
+			"/v1/api/items/item",
+
+			//item review service
+			"/v1/api/review/average_rating",
+			"/v1/api/review/reviews",
+			"/v1/api/review/user_reviews"
 	);
 
 	/**
@@ -43,6 +48,9 @@ public class RouteValidator {
 			"/v1/api/items/delete/", ADMIN_ROLE,
 
 			"v1/api/cart", ALL_ROLES,
+
+			"/v1/api/review/add", ALL_ROLES,
+			"/v1/api/review/edit", ALL_ROLES,
 
 			"/v1/api/email", NO_ACCESS,
 			"/v1/api/storage", NO_ACCESS

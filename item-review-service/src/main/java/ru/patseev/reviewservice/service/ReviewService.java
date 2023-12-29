@@ -12,11 +12,11 @@ public interface ReviewService {
 
 	BigDecimal getAverageItemRating(int itemId);
 
-	ResponseEntity<InfoResponse> addReviewAndRatingForItemFromUser(int userId, FeedbackRequest request);
+	ResponseEntity<InfoResponse> addReviewForItem(int userId, FeedbackRequest request);
 
-	List<ReviewResponse> getAllReviewAndRatingForItemFromUsers(int itemId);
+	List<ReviewResponse> getAllReviewsForItem(int itemId);
 
-	List<ReviewResponse> getAllReviewAndRatingFromUserByUserId(int userId);
+	List<ReviewResponse> getAllReviewsFromSpecificUser(int userId);
 
-	ResponseEntity<InfoResponse> editReviewAndRatingForItem(int userId, FeedbackRequest request);
+	ResponseEntity<InfoResponse> editReviewForItem(int userId, FeedbackRequest request);
 }

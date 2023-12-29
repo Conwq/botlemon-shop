@@ -1,8 +1,11 @@
 package ru.patseev.reviewservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.patseev.jwtservice.starter.service.JwtHeader;
+import ru.patseev.jwtservice.starter.service.JwtService;
 import ru.patseev.reviewservice.dto.FeedbackRequest;
 import ru.patseev.reviewservice.dto.InfoResponse;
 import ru.patseev.reviewservice.dto.ReviewResponse;
@@ -11,39 +14,86 @@ import ru.patseev.reviewservice.service.ReviewService;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * Контроллер отвечающий за работу сервиса обзоров предметов.
+ */
 @RestController
 @RequestMapping("/v1/api/review")
 @RequiredArgsConstructor
 public class ReviewController {
 	private final ReviewService reviewService;
+	private final JwtService jwtService;
 
-	@GetMapping("/rating/{itemId}")
+	/**
+	 * Получает среднюю оценку товара.
+	 *
+	 * @param itemId Идентификатор предмета, среднюю оценку которого вернуть.
+	 * @return Среднюю оценку предмета.
+	 */
+	@GetMapping("/average_rating/{itemId}")
 	public ResponseEntity<BigDecimal> getAverageItemRating(@PathVariable("itemId") int itemId) {
 		BigDecimal averageItemRating = reviewService.getAverageItemRating(itemId);
 		return ResponseEntity.ok(averageItemRating);
 	}
 
-	@PostMapping("/{userId}")
-	public ResponseEntity<InfoResponse> addReviewAndRatingForItemFromUser(@PathVariable("userId") int userId,
-																		  @RequestBody FeedbackRequest request) {
-		return reviewService.addReviewAndRatingForItemFromUser(userId, request);
-	}
-
-	@GetMapping("/{itemId}")
-	public ResponseEntity<List<ReviewResponse>> getAllReviewAndRatingForItemFromUsers(@PathVariable("itemId") int itemId) {
-		List<ReviewResponse> allReviewForItem = reviewService.getAllReviewAndRatingForItemFromUsers(itemId);
+	/**
+	 * Получает все обзоры пользователей для конкретного предмета.
+	 *
+	 * @param itemId Идентификатор предмета, обзоры на который нужно получить.
+	 * @return Список обзоров от пользователей.
+	 */
+	@GetMapping("/reviews/{itemId}")
+	public ResponseEntity<List<ReviewResponse>> getAllReviewsForItem(@PathVariable("itemId") int itemId) {
+		List<ReviewResponse> allReviewForItem = reviewService.getAllReviewsForItem(itemId);
 		return ResponseEntity.ok(allReviewForItem);
 	}
 
-	@GetMapping("/user_review/{userId}")
-	public ResponseEntity<List<ReviewResponse>> getAllReviewAndRatingFromUserByUserId(@PathVariable("userId") int userId) {
-		List<ReviewResponse> allReviewForItemFromUser = reviewService.getAllReviewAndRatingFromUserByUserId(userId);
+	/**
+	 * Получает все обзоры пользователя.
+	 *
+	 * @param header Заголовок запроса (JSON Web Token).
+	 * @return Список обзоров от пользователей.
+	 */
+	@GetMapping("/user_reviews")
+	public ResponseEntity<List<ReviewResponse>> getAllReviewsFromSpecificUser(
+			@RequestHeader(HttpHeaders.AUTHORIZATION) String header
+	) {
+		final String token = header.replace(JwtHeader.BEARER, "");
+		int userId = jwtService.extractUserId(token);
+
+		List<ReviewResponse> allReviewForItemFromUser = reviewService.getAllReviewsFromSpecificUser(userId);
 		return ResponseEntity.ok(allReviewForItemFromUser);
 	}
 
-	@PatchMapping("/{userId}")
-	public ResponseEntity<InfoResponse> editReviewAndRatingForItem(@PathVariable("userId") int userId,
-																   @RequestBody FeedbackRequest request) {
-		return reviewService.editReviewAndRatingForItem(userId, request);
+	/**
+	 * Добавляет обзор от пользователя.
+	 *
+	 * @param header  Заголовок запроса (JSON Web Token).
+	 * @param request Запрос на добавление обзора.
+	 * @return Возвращает информацию о добавлении обзора для предмета.
+	 */
+	@PostMapping("/add")
+	public ResponseEntity<InfoResponse> addReviewForItem(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
+														 @RequestBody FeedbackRequest request) {
+		final String token = header.replace(JwtHeader.BEARER, "");
+		int userId = jwtService.extractUserId(token);
+
+		return reviewService.addReviewForItem(userId, request);
+	}
+
+	/**
+	 * Изменяет опубликованный обзор от пользователя.
+	 *
+	 * @param header  Заголовок запроса (JSON Web Token).
+	 * @param request Запрос на обновление обзора.
+	 * @return Возвращает информацию об изменении обзора предмета.
+	 */
+	@PatchMapping("/edit")
+	public ResponseEntity<InfoResponse> editReviewForItem(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
+														  @RequestBody FeedbackRequest request) {
+		final String token = header.replace(JwtHeader.BEARER, "");
+		int userId = jwtService.extractUserId(token);
+
+		return reviewService.editReviewForItem(userId, request);
 	}
 }

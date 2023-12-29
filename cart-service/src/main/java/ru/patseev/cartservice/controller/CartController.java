@@ -8,18 +8,18 @@ import ru.patseev.cartservice.dto.CartRequest;
 import ru.patseev.cartservice.dto.InfoResponse;
 import ru.patseev.cartservice.dto.ItemDto;
 import ru.patseev.cartservice.service.CartService;
+import ru.patseev.jwtservice.starter.service.JwtHeader;
 import ru.patseev.jwtservice.starter.service.JwtService;
 
 import java.util.List;
 
 /**
- * Контроллер предназначенный для работы с корзиной покупок
+ * Контроллер предназначенный для работы с корзиной покупок.
  */
 @RestController
 @RequestMapping("/v1/api/cart")
 @RequiredArgsConstructor
 public class CartController {
-	private static final String BEARER = "Bearer ";
 	private final CartService cartService;
 	private final JwtService jwtService;
 
@@ -31,7 +31,7 @@ public class CartController {
 	 */
 	@GetMapping
 	public List<ItemDto> getUserShoppingCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
-		final String token = header.replace(BEARER, "");
+		final String token = header.replace(JwtHeader.BEARER, "");
 		int userId = jwtService.extractUserId(token);
 
 		return cartService.getUsersShoppingCart(userId);
@@ -47,7 +47,7 @@ public class CartController {
 	@PostMapping
 	public ResponseEntity<InfoResponse> addItemToCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
 													  @RequestBody CartRequest request) {
-		String token = header.replace(BEARER, "");
+		String token = header.replace(JwtHeader.BEARER, "");
 		int userId = jwtService.extractUserId(token);
 
 		return cartService.addItemToUsersShoppingCart(userId, request);
@@ -63,7 +63,7 @@ public class CartController {
 	@DeleteMapping
 	public ResponseEntity<InfoResponse> removeItemFromCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
 														   @RequestBody CartRequest request) {
-		String token = header.replace(BEARER, "");
+		String token = header.replace(JwtHeader.BEARER, "");
 		int userId = jwtService.extractUserId(token);
 
 		return cartService.removeItemFromUsersShoppingCart(userId, request);

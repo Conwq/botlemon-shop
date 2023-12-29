@@ -10,6 +10,7 @@ import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import ru.patseev.jwtservice.starter.service.JwtHeader;
 
 /**
  * Фильтр для сервиса аутентификации.
@@ -57,6 +58,6 @@ public class AuthenticationServiceFilter implements GatewayFilter {
 	 */
 	private boolean isAuthHeaderPresent(ServerHttpRequest request) {
 		return request.getHeaders().containsKey(HttpHeaders.AUTHORIZATION) &&
-				request.getHeaders().getOrEmpty(HttpHeaders.AUTHORIZATION).get(0).startsWith("Bearer ");
+				request.getHeaders().getOrEmpty(HttpHeaders.AUTHORIZATION).get(0).startsWith(JwtHeader.BEARER);
 	}
 }
