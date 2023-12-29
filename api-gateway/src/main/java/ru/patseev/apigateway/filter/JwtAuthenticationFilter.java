@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 import ru.patseev.apigateway.configuration.RouteValidator;
-import ru.patseev.apigateway.service.JwtService;
+import ru.patseev.jwtservice.starter.service.JwtService;
 
 import java.util.function.Predicate;
 

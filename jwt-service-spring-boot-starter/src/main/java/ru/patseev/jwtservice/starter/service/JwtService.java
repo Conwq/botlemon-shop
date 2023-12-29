@@ -1,4 +1,4 @@
-package ru.patseev.cartservice.service;
+package ru.patseev.jwtservice.starter.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -8,12 +8,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.Date;
+import java.util.Map;
 import java.util.function.Function;
 
 @Service
 public class JwtService {
 	@Value("${spring.jwt.secret-key}")
 	private String secret;
+	@Value("${spring.jwt.expiration}")
+	private Long expiration;
+
+	public String generateToken(Map<String, Object> claims, String username) {
+		return createToken(claims, username);
+	}
 
 	private SecretKey getSignKey() {
 		byte[] keyBytes = Decoders.BASE64.decode(secret);
@@ -22,6 +30,14 @@ public class JwtService {
 
 	public int extractUserId(String token) {
 		return extractClaim(token, claim -> claim.get("userId", Integer.class));
+	}
+
+	public String extractUsername(String token) {
+		return extractClaim(token, Claims::getSubject);
+	}
+
+	public String extractUserRole(String token) {
+		return extractClaim(token, claim -> claim.get("role", String.class));
 	}
 
 	private Claims extractAllClaims(String token) {
@@ -36,5 +52,15 @@ public class JwtService {
 	private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
 		Claims claims = extractAllClaims(token);
 		return claimsResolver.apply(claims);
+	}
+
+	private String createToken(Map<String, Object> claims, String username) {
+		return Jwts.builder()
+				.claims(claims)
+				.subject(username)
+				.issuedAt(new Date(System.currentTimeMillis()))
+				.expiration(new Date(System.currentTimeMillis() + expiration))
+				.signWith(getSignKey(), Jwts.SIG.HS256)
+				.compact();
 	}
 }

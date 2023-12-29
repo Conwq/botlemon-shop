@@ -8,7 +8,7 @@ import ru.patseev.cartservice.dto.CartRequest;
 import ru.patseev.cartservice.dto.InfoResponse;
 import ru.patseev.cartservice.dto.ItemDto;
 import ru.patseev.cartservice.service.CartService;
-import ru.patseev.cartservice.service.JwtService;
+import ru.patseev.jwtservice.starter.service.JwtService;
 
 import java.util.List;
 

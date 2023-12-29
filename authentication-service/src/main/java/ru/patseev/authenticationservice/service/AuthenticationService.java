@@ -14,6 +14,7 @@ import ru.patseev.authenticationservice.dto.AuthResponse;
 import ru.patseev.authenticationservice.exception.UserAlreadyExistException;
 import ru.patseev.authenticationservice.repository.RoleRepository;
 import ru.patseev.authenticationservice.repository.UserCredentialRepository;
+import ru.patseev.jwtservice.starter.service.JwtService;
 
 import java.util.Map;
 import java.util.UUID;

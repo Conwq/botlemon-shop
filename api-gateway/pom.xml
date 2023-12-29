@@ -37,19 +37,9 @@
             <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-api</artifactId>
-            <version>0.12.3</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-impl</artifactId>
-            <version>0.12.3</version>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt-jackson</artifactId>
-            <version>0.12.3</version>
+            <groupId>ru.patseev</groupId>
+            <artifactId>jwt-service-spring-boot-starter</artifactId>
+            <version>1.0</version>
         </dependency>
     </dependencies>
 </project>
