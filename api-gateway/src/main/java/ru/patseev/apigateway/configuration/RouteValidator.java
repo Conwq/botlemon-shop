@@ -30,7 +30,10 @@ public class RouteValidator {
 
 			//Item service
 			"/v1/api/items/all_items",
-			"/v1/api/items/item"
+			"/v1/api/items/item",
+
+			//Storage service
+			"/v1/api/storage"
 	);
 
 	/**
