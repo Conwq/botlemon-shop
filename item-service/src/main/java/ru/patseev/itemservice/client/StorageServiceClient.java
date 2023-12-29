@@ -15,7 +15,7 @@ import java.util.Objects;
 public class StorageServiceClient {
 	private final WebClient.Builder webClientBuilder;
 
-	public void updateStorageQuantity(ItemDto itemDto) {
+	public void updateItemQuantityInStorage(ItemDto itemDto) {
 		ResponseEntity<Object> response = webClientBuilder.build()
 				.put()
 				.uri("lb://storage-service/v1/api/storage/edit")
@@ -29,7 +29,7 @@ public class StorageServiceClient {
 		}
 	}
 
-	public int getQuantityItem(int itemId) {
+	public int getQuantityItemFromStorage(int itemId) {
 		return webClientBuilder.build()
 				.get()
 				.uri("lb://storage-service/v1/api/storage/{itemId}",

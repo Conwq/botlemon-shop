@@ -27,19 +27,19 @@ public class RoutingConfiguration {
 	public RouteLocator rotes(RouteLocatorBuilder builder) {
 		return builder
 				.routes()
+				//port 5011
 				.route("item-service",
 						p -> p.path("/v1/api/items/**")
 								.filters(f -> f.filter(itemServiceFilter))
 								.uri("lb://item-service")
 				)
-//				.route("cart-service",
-//						p -> p.path("/v1/api/cart/**")
-//								.uri("lb://cart-service")
-//				)
-//				.route("user-service",
-//						p -> p.path("/v1/api/users")
-//								.uri("lb://user-service")
-//				)
+				//port 5012
+				.route("cart-service",
+						p -> p.path("/v1/api/cart/**")
+								.filters(f -> f.filter(itemServiceFilter))
+								.uri("lb://cart-service")
+				)
+				//port 5014
 				.route("storage-service",
 						p -> p.path("/v1/api/storage/**")
 								.filters(f -> f.filter(itemServiceFilter))
@@ -49,11 +49,13 @@ public class RoutingConfiguration {
 //						p -> p.path("/v1/api/review/**")
 //								.uri("lb://items-reviews-service")
 //				)
+				//port 5017
 				.route("authentication-service",
 						p -> p.path("/v1/api/auth/**")
 								.filters(f -> f.filter(authenticationFilter))
 								.uri("lb://authentication-service")
 				)
+				//port 5018
 				.route("email-sender-service",
 						p -> p.path("/v1/api/email/**")
 								.uri("lb://email-sender-service")

@@ -97,12 +97,12 @@ public class ItemService {
 			itemEntity.setPrice(price);
 		}
 		if (Objects.nonNull(itemDto.getQuantity())) {
-			storageServiceClient.updateStorageQuantity(itemDto);
+			storageServiceClient.updateItemQuantityInStorage(itemDto);
 		}
 	}
 
 	private ItemDto mapItemEntityToItemDtoWithQuantity(ItemEntity itemEntity) {
-		int quantityItem = storageServiceClient.getQuantityItem(itemEntity.getId());
+		int quantityItem = storageServiceClient.getQuantityItemFromStorage(itemEntity.getId());
 		ItemDto itemDto = itemMapper.toDto(itemEntity);
 		itemDto.setQuantity(quantityItem);
 		return itemDto;
