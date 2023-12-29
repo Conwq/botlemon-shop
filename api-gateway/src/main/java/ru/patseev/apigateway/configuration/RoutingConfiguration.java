@@ -5,8 +5,8 @@ import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import ru.patseev.apigateway.filter.AuthenticationFilter;
-import ru.patseev.apigateway.filter.ItemServiceFilter;
+import ru.patseev.apigateway.filter.AuthenticationServiceFilter;
+import ru.patseev.apigateway.filter.JwtAuthenticationFilter;
 
 /**
  * Конфигурационный класс предназначенный для настройки маршрутизации конечных точек.
@@ -14,8 +14,8 @@ import ru.patseev.apigateway.filter.ItemServiceFilter;
 @Configuration
 @RequiredArgsConstructor
 public class RoutingConfiguration {
-	private final AuthenticationFilter authenticationFilter;
-	private final ItemServiceFilter itemServiceFilter;
+	private final AuthenticationServiceFilter authenticationServiceFilter;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	/**
 	 * Создает и настраивает маршруты для различных сервисов с использованием фильтров и без них.
@@ -30,19 +30,19 @@ public class RoutingConfiguration {
 				//port 5011
 				.route("item-service",
 						p -> p.path("/v1/api/items/**")
-								.filters(f -> f.filter(itemServiceFilter))
+								.filters(f -> f.filter(jwtAuthenticationFilter))
 								.uri("lb://item-service")
 				)
 				//port 5012
 				.route("cart-service",
 						p -> p.path("/v1/api/cart/**")
-								.filters(f -> f.filter(itemServiceFilter))
+								.filters(f -> f.filter(jwtAuthenticationFilter))
 								.uri("lb://cart-service")
 				)
 				//port 5014
 				.route("storage-service",
 						p -> p.path("/v1/api/storage/**")
-								.filters(f -> f.filter(itemServiceFilter))
+								.filters(f -> f.filter(jwtAuthenticationFilter))
 								.uri("lb://storage-service")
 				)
 //				.route("items-reviews-service",
@@ -52,7 +52,7 @@ public class RoutingConfiguration {
 				//port 5017
 				.route("authentication-service",
 						p -> p.path("/v1/api/auth/**")
-								.filters(f -> f.filter(authenticationFilter))
+								.filters(f -> f.filter(authenticationServiceFilter))
 								.uri("lb://authentication-service")
 				)
 				//port 5018

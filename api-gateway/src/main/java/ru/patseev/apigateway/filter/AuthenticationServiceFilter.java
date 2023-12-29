@@ -16,11 +16,12 @@ import reactor.core.publisher.Mono;
  */
 @Component
 @RequiredArgsConstructor
-public class AuthenticationFilter implements GatewayFilter {
+public class AuthenticationServiceFilter implements GatewayFilter {
 
 	/**
 	 * Фильтрует входящий запрос, проверяя наличие заголовка авторизации.
 	 * Создать его для того, чтобы только не аутентифицированные пользователи могли воспользоваться данным сервисом.
+	 * Для авторизированных пользователей он будет недоступен.
 	 *
 	 * @param exchange   Обмен данными между клиентом и сервером.
 	 * @param chain      Цепочка фильтров.

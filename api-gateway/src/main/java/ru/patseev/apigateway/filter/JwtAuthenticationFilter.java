@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 
 @Component
 @RequiredArgsConstructor
-public class ItemServiceFilter implements GatewayFilter {
+public class JwtAuthenticationFilter implements GatewayFilter {
 	private final JwtService jwtService;
 	private final RouteValidator routeValidator;
 

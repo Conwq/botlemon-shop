@@ -15,11 +15,7 @@ import java.util.function.Predicate;
 @Component
 @RequiredArgsConstructor
 public class RouteValidator {
-	/*
-	 * Напрямую к сервисам с такой ролью доступ получить нельзя,
-	 * только через сторонние сервисы.
-	 */
-	private static final Set<String> NO_ACCESS = Set.of("NO_ACCESS");
+	private static final Set<String> NO_ACCESS = Set.of("NO_ACCESS"); //Напрямую к сервисам с такой ролью доступ получить нельзя, только через сторонние сервисы.
 	private static final Set<String> ADMIN_ROLE = Set.of("ADMIN");
 	private static final Set<String> ALL_ROLES = Set.of("USER", "ADMIN");
 
@@ -48,6 +44,7 @@ public class RouteValidator {
 
 			"v1/api/cart", ALL_ROLES,
 
+			"/v1/api/email", NO_ACCESS,
 			"/v1/api/storage", NO_ACCESS
 	);
 
