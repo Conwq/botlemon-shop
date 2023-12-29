@@ -33,8 +33,8 @@ public class StorageController {
 	 * @return Статус с кодом выполнения.
 	 */
 	@PostMapping
-	public ResponseEntity<Object> addQuantityForItem(@RequestBody StorageRequest request) {
-		return storageService.addQuantityForItem(request.itemId(), request.quantity());
+	public ResponseEntity<Object> addQuantityItemToStorage(@RequestBody StorageRequest request) {
+		return storageService.addQuantityItemToStorage(request.itemId(), request.quantity());
 	}
 
 	/**
@@ -44,8 +44,8 @@ public class StorageController {
 	 * @return Статус с кодом выполнения.
 	 */
 	@DeleteMapping("/{itemId}")
-	public ResponseEntity<Object> removeQuantityForItem(@PathVariable("itemId") int itemId) {
-		return storageService.removeQuantityForItem(itemId);
+	public ResponseEntity<Object> removeItemQuantityFromStorage(@PathVariable("itemId") int itemId) {
+		return storageService.removeItemQuantityFromStorage(itemId);
 	}
 
 	/**
@@ -59,6 +59,7 @@ public class StorageController {
 		return storageService.editItemQuantity(request.itemId(), request.quantity());
 	}
 
+	//Этот конечная точка работает с Cart Service
 	/**
 	 * Возвращает количество товара к количеству, которое есть в хранилище.
 	 *
@@ -68,9 +69,10 @@ public class StorageController {
 	 */
 	@PutMapping("/return")
 	public ResponseEntity<Object> returnQuantityOfItemToStorage(@RequestBody StorageRequest request) {
-		return storageService.returnQuantityOfItemToStorage(request.itemId(), request.quantity());
+		return storageService.returnQuantityOfItemFromCartToStorage(request.itemId(), request.quantity());
 	}
 
+	//Эта конечная точка работает с Cart Service
 	/**
 	 * Забирает указанное количество товара из хранилища.
 	 *

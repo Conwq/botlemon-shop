@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 @Component
 @RequiredArgsConstructor
 public class RouteValidator {
+	private static final Set<String> NO_ACCESS = Set.of("NO_ACCESS");
 	private static final Set<String> ADMIN_ROLE = Set.of("ADMIN");
 	private static final Set<String> ALL_ROLES = Set.of("USER", "ADMIN");
 
@@ -30,10 +31,7 @@ public class RouteValidator {
 
 			//Item service
 			"/v1/api/items/all_items",
-			"/v1/api/items/item",
-
-			//Storage service
-			"/v1/api/storage"
+			"/v1/api/items/item"
 	);
 
 	/**
@@ -42,7 +40,9 @@ public class RouteValidator {
 	private final Map<String, Set<String>> closeApiEndpoints = Map.of(
 			"/v1/api/items/add", ADMIN_ROLE,
 			"/v1/api/items/edit", ADMIN_ROLE,
-			"/v1/api/items/delete/", ADMIN_ROLE
+			"/v1/api/items/delete/", ADMIN_ROLE,
+
+			"/v1/api/storage", NO_ACCESS
 	);
 
 	/**

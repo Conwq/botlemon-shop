@@ -40,10 +40,11 @@ public class RoutingConfiguration {
 //						p -> p.path("/v1/api/users")
 //								.uri("lb://user-service")
 //				)
-//				.route("storage-service",
-//						p -> p.path("/v1/api/storage/**")
-//								.uri("lb://storage-service")
-//				)
+				.route("storage-service",
+						p -> p.path("/v1/api/storage/**")
+								.filters(f -> f.filter(itemServiceFilter))
+								.uri("lb://storage-service")
+				)
 //				.route("items-reviews-service",
 //						p -> p.path("/v1/api/review/**")
 //								.uri("lb://items-reviews-service")

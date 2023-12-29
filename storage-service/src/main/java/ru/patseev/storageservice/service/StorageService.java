@@ -23,7 +23,7 @@ public class StorageService {
 	}
 
 	@Transactional
-	public ResponseEntity<Object> addQuantityForItem(int itemId, int quantity) {
+	public ResponseEntity<Object> addQuantityItemToStorage(int itemId, int quantity) {
 		return itemRepository
 				.findById(itemId)
 				.map(itemEntity -> {
@@ -38,7 +38,7 @@ public class StorageService {
 	}
 
 	@Transactional
-	public ResponseEntity<Object> removeQuantityForItem(int itemId) {
+	public ResponseEntity<Object> removeItemQuantityFromStorage(int itemId) {
 		return storageRepository
 				.findByItemId(itemId)
 				.map(storageEntity -> {
@@ -60,7 +60,7 @@ public class StorageService {
 	}
 
 	@Transactional
-	public ResponseEntity<Object> returnQuantityOfItemToStorage(int itemId, int quantity) {
+	public ResponseEntity<Object> returnQuantityOfItemFromCartToStorage(int itemId, int quantity) {
 		Integer itemQuantity = this.getQuantityForItem(itemId);
 		if (itemQuantity == null) {
 			return ResponseEntity.notFound().build();
@@ -69,6 +69,7 @@ public class StorageService {
 		return this.editItemQuantity(itemId, newItemQuantity);
 	}
 
+	//TODO переписать логику по проверки доступности количества товара тут, для того чтобы не обращаться 2 раза в этот сервис
 	@Transactional
 	public ResponseEntity<Object> addItemQuantityToCart(int itemId, int quantity) {
 		return storageRepository
