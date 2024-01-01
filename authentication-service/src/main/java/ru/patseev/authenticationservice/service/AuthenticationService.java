@@ -49,7 +49,6 @@ public class AuthenticationService {
 				.filter(UserEntity::isEnabled)
 				.filter(user -> passwordEncoder.matches(request.password(), user.getPassword()))
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
 		String token = this.generateJsonWebToken(userCredential);
 
 		return new AuthResponse(token);

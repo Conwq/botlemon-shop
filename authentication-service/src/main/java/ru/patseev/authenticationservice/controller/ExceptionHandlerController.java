@@ -1,4 +1,4 @@
-package ru.patseev.authenticationservice.configuration;
+package ru.patseev.authenticationservice.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

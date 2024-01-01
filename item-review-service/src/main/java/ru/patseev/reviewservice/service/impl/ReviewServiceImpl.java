@@ -24,6 +24,9 @@ import java.math.RoundingMode;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * Сервис по работе с обзорами на предметы.
+ */
 @Service
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
@@ -32,6 +35,12 @@ public class ReviewServiceImpl implements ReviewService {
 	private final UserRepository userRepository;
 	private final ReviewMapper reviewMapper;
 
+	/**
+	 * Получает средний рейтинг предмета.
+	 *
+	 * @param itemId Идентификатор предмета.
+	 * @return Значение среднего рейтинга в формате Х.Х.
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public BigDecimal getAverageItemRating(int itemId) {
@@ -50,6 +59,13 @@ public class ReviewServiceImpl implements ReviewService {
 				.divide(BigDecimal.valueOf(voters), 1, RoundingMode.HALF_UP);
 	}
 
+	/**
+	 * Добавляет обзор на предмет.
+	 *
+	 * @param userId  Идентификатор пользователя, который добавляет обзор.
+	 * @param request Объект с оценкой и комментарием.
+	 * @return Возвращает объект ответа со статусом и сообщением.
+	 */
 	@Override
 	@Transactional
 	public ResponseEntity<InfoResponse> addReviewForItem(int userId, FeedbackRequest request) {
@@ -67,6 +83,12 @@ public class ReviewServiceImpl implements ReviewService {
 		return this.createResponse(Actions.ADD_REVIEW, HttpStatus.CREATED);
 	}
 
+	/**
+	 * Получает все обзоры на конкретный предмет.
+	 *
+	 * @param itemId Идентификатор предмета.
+	 * @return Возвращает список комментариев предмета.
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<ReviewResponse> getAllReviewsForItem(int itemId) {
@@ -79,6 +101,12 @@ public class ReviewServiceImpl implements ReviewService {
 				.toList();
 	}
 
+	/**
+	 * Получает все обзоры для конкретного пользователя.
+	 *
+	 * @param userId Идентификатор пользователя, для которого нужно получить обзоры.
+	 * @return Возвращает список комментариев предмета оставленные определенным пользователем.
+	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<ReviewResponse> getAllReviewsFromSpecificUser(int userId) {
@@ -91,6 +119,14 @@ public class ReviewServiceImpl implements ReviewService {
 				.toList();
 	}
 
+	/**
+	 * Меняет обзор на предмет.
+	 * Обзор может менять лишь тот пользователь, который оставил этот комментарий.
+	 *
+	 * @param userId  Идентификатор пользователя, который оставляет обзор.
+	 * @param request Запрос на изменение обзора.
+	 * @return Возвращает тело ответо со статусом и сообщением.
+	 */
 	@Override
 	@Transactional
 	public ResponseEntity<InfoResponse> editReviewForItem(int userId, FeedbackRequest request) {
@@ -114,6 +150,10 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviewEntity;
 	}
 
+	/*
+	 * Проверяет, оставлял ли данный пользователь комментарий под этим предметом.
+	 * Комментарий можно оставлять под предметом лишь один раз.
+	 */
 	private void checkForDuplicateReview(int userId, ItemEntity itemEntity) {
 		List<ReviewEntity> reviewEntityList = itemEntity.getReviewEntityList();
 
@@ -123,11 +163,17 @@ public class ReviewServiceImpl implements ReviewService {
 		}
 	}
 
+	/*
+	 * Создает ответ
+	 */
 	private ResponseEntity<InfoResponse> createResponse(Actions action, HttpStatus status) {
 		InfoResponse infoResponse = new InfoResponse(action, status);
 		return new ResponseEntity<>(infoResponse, status);
 	}
 
+	/*
+	 * Меняет поля у предмета.
+	 */
 	private ReviewEntity editFieldReviewEntity(int userId, FeedbackRequest request) {
 		ReviewEntity reviewEntity = reviewRepository
 				.findById(request.id())

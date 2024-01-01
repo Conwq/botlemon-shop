@@ -29,20 +29,9 @@ public class StorageService {
 				.map(itemEntity -> {
 					StorageEntity storageEntity = StorageEntity.builder()
 							.item(itemEntity)
-							.quantity(quantity)
-							.build();
+							.quantity(quantity).build();
+					itemEntity.setStorage(storageEntity);
 					storageRepository.save(storageEntity);
-					return ResponseEntity.ok().build();
-				})
-				.orElse(ResponseEntity.notFound().build());
-	}
-
-	@Transactional
-	public ResponseEntity<Object> removeItemQuantityFromStorage(int itemId) {
-		return storageRepository
-				.findByItemId(itemId)
-				.map(storageEntity -> {
-					storageRepository.delete(storageEntity);
 					return ResponseEntity.ok().build();
 				})
 				.orElse(ResponseEntity.notFound().build());
@@ -54,6 +43,17 @@ public class StorageService {
 				.findByItemId(itemId)
 				.map(storageEntity -> {
 					storageEntity.setQuantity(quantity);
+					return ResponseEntity.ok().build();
+				})
+				.orElse(ResponseEntity.notFound().build());
+	}
+
+	@Transactional
+	public ResponseEntity<Object> removeItemQuantityFromStorage(int itemId) {
+		return storageRepository
+				.findByItemId(itemId)
+				.map(storageEntity -> {
+					storageRepository.delete(storageEntity);
 					return ResponseEntity.ok().build();
 				})
 				.orElse(ResponseEntity.notFound().build());

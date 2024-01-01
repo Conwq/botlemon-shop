@@ -14,6 +14,7 @@ import ru.patseev.cartservice.dto.CartRequest;
 import ru.patseev.cartservice.dto.InfoResponse;
 import ru.patseev.cartservice.dto.ItemDto;
 import ru.patseev.cartservice.exception.ItemNotFoundException;
+import ru.patseev.cartservice.exception.UnacceptableQualityItemsException;
 import ru.patseev.cartservice.exception.UserNotFoundException;
 import ru.patseev.cartservice.mapper.ItemMapper;
 import ru.patseev.cartservice.repository.CartRepository;
@@ -61,20 +62,22 @@ public class CartService {
 	@Transactional
 	public ResponseEntity<InfoResponse> addItemToUsersShoppingCart(int userId, CartRequest request) {
 		final int itemId = request.itemId();
-		int quantity;
-
-		if ((quantity = request.quantity()) <= 0) {
+		int quantity = request.quantity();
+		if (quantity <= 0) {
 			return createResponse(Actions.ADD, HttpStatus.BAD_REQUEST);
 		}
 
-		storageServiceClient.checkAvailableItemQuantity(itemId, quantity);
+		if (!this.isEnoughItemForStorage(itemId, quantity)) {
+			throw new UnacceptableQualityItemsException("Unacceptable quality of items");
+		}
 
-		CartEntity cartEntity
-				= this.findOrCreateCartEntity(userId, itemId, quantity);
+		CartEntity cartEntity = this.findOrCreateCartEntity(userId, itemId, quantity);
 
-		//TODO придумать обработку ответа
-		ResponseEntity<Object> response
-				= storageServiceClient.addItemQuantityToCart(itemId, quantity);
+		ResponseEntity<Object> response = storageServiceClient.addItemQuantityToCart(itemId, quantity);
+
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			return createResponse(Actions.ADD, HttpStatus.BAD_REQUEST);
+		}
 
 		cartRepository.save(cartEntity);
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
@@ -91,7 +94,6 @@ public class CartService {
 	public ResponseEntity<InfoResponse> removeItemFromUsersShoppingCart(int userId, CartRequest request) {
 		int quantity;
 		CartEntity cartEntity = this.getCartEntityByUserIdAndItemId(userId, request.itemId());
-
 		if (cartEntity.getQuantity() <= request.quantity()) {
 			quantity = cartEntity.getQuantity();
 			cartRepository.delete(cartEntity);
@@ -99,16 +101,17 @@ public class CartService {
 			quantity = request.quantity();
 			cartEntity.setQuantity(cartEntity.getQuantity() - request.quantity());
 		}
-
-		//TODO придумать обработку ответа
 		ResponseEntity<Object> response
 				= storageServiceClient.returnQuantityOfItemToStorage(request.itemId(), quantity);
-
+		if (!response.getStatusCode().is2xxSuccessful()) {
+			return createResponse(Actions.REMOVE, HttpStatus.BAD_REQUEST);
+		}
 		return createResponse(Actions.REMOVE, HttpStatus.OK);
 	}
 
 	/*
-	 * Получение сущности Cart по userId и itemId. Если не найдено - то возвращает новую сущность.
+	 * Получение сущности Cart по userId и itemId, и меняет количество товара, добавляя к старому значение новое.
+	 * Если не найдено - то возвращает новую сущность с количеством, которое указал пользователь.
 	 */
 	private CartEntity findOrCreateCartEntity(int userId, int itemId, int quantity) {
 		return cartRepository
@@ -183,5 +186,14 @@ public class CartService {
 	private ResponseEntity<InfoResponse> createResponse(Actions action, HttpStatus status) {
 		InfoResponse infoResponse = new InfoResponse(action, status);
 		return new ResponseEntity<>(infoResponse, status);
+	}
+
+	/*
+	 * Проверяем доступное количество предметов на складе
+	 */
+	private boolean isEnoughItemForStorage(int itemId, int quantity) {
+		int itemQuantity = storageServiceClient.getAvailableItemQuantity(itemId); //Получает количество товара со склада.
+
+		return itemQuantity - quantity >= 0;
 	}
 }

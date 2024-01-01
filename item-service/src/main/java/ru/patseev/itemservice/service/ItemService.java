@@ -27,6 +27,12 @@ public class ItemService {
 	private final ItemMapper itemMapper;
 	private final StorageServiceClient storageServiceClient;
 
+	/**
+	 * Получает предмет по идентификатору.
+	 *
+	 * @param itemId Идентификатор предмета.
+	 * @return Возвращает предмет.
+	 */
 	@Transactional(readOnly = true)
 	public ItemDto getItemById(int itemId) {
 		return itemRepository
@@ -35,6 +41,11 @@ public class ItemService {
 				.orElseThrow(ItemNotFoundException::new);
 	}
 
+	/**
+	 * Получает все доступные предметы.
+	 *
+	 * @return Список предметов.
+	 */
 	@Transactional(readOnly = true)
 	public List<ItemDto> getAllItems() {
 		return itemRepository.findAll()
@@ -44,6 +55,9 @@ public class ItemService {
 	}
 
 	//TODO transactional
+	/*
+	 * Сохраняет предмет в БД и его количество через сторонний клиент Storage.
+	 */
 	public ResponseEntity<InfoResponse> addItem(ItemDto itemDto) {
 		ItemEntity itemEntity = this.createItemEntity(itemDto);
 		int itemId = itemRepository.save(itemEntity).getId();
@@ -53,6 +67,12 @@ public class ItemService {
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
 	}
 
+	/**
+	 * Удаляет предмет.
+	 *
+	 * @param itemId Идентфикатор удаляемого предмета.
+	 * @return Возвращает информацию по удалению со статусом.
+	 */
 	@Transactional
 	public ResponseEntity<InfoResponse> deleteItem(int itemId) {
 		itemRepository.findById(itemId)
@@ -64,6 +84,12 @@ public class ItemService {
 		return createResponse(Actions.DELETE, HttpStatus.OK);
 	}
 
+	/**
+	 * Изменяет предмет.
+	 *
+	 * @param itemDto Объект с новыми данными.
+	 * @return Статус об изменении.
+	 */
 	@Transactional
 	public ResponseEntity<InfoResponse> editItem(ItemDto itemDto) {
 		itemRepository
@@ -77,11 +103,17 @@ public class ItemService {
 		return createResponse(Actions.EDIT, HttpStatus.OK);
 	}
 
+	/*
+	 * Создает тело ответа со статусом.
+	 */
 	private ResponseEntity<InfoResponse> createResponse(Actions action, HttpStatus status) {
 		InfoResponse infoResponse = new InfoResponse(action, status);
 		return new ResponseEntity<>(infoResponse, status);
 	}
 
+	/*
+	 * Обновляет поля предмета.
+	 */
 	private void updateItemField(ItemDto itemDto, ItemEntity itemEntity) {
 		final String name;
 		final String description;
@@ -101,6 +133,9 @@ public class ItemService {
 		}
 	}
 
+	/*
+	 * Преобразует сущность Item в Dto с его количеством.
+	 */
 	private ItemDto mapItemEntityToItemDtoWithQuantity(ItemEntity itemEntity) {
 		int quantityItem = storageServiceClient.getQuantityItemFromStorage(itemEntity.getId());
 		ItemDto itemDto = itemMapper.toDto(itemEntity);
@@ -108,6 +143,9 @@ public class ItemService {
 		return itemDto;
 	}
 
+	/*
+	 * Создает сущность Item и меняет у него дату на текущую.
+	 */
 	private ItemEntity createItemEntity(ItemDto itemDto) {
 		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
 		itemEntity.setPublicationDate(Timestamp.from(Instant.now()));

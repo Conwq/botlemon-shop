@@ -9,13 +9,22 @@ import ru.patseev.cartservice.exception.UnacceptableQualityItemsException;
 
 import java.util.Objects;
 
+/**
+ * Клиент для взаимодействия с сервисом хранения (Storage service).
+ */
 @Component
 @RequiredArgsConstructor
 public class StorageServiceClient {
 	private final WebClient.Builder webClientBuilder;
 
-	public void checkAvailableItemQuantity(int itemId, int quantity) {
-		Integer itemQuantity = Objects.requireNonNull(
+	/**
+	 * Получает доступное количество конкретного товара на складе.
+	 *
+	 * @param itemId    Идентификатор товара для проверки.
+	 * @throws UnacceptableQualityItemsException, если доступное количество меньше желаемого.
+	 */
+	public int getAvailableItemQuantity(int itemId) {
+		return Objects.requireNonNull(
 				webClientBuilder.build()
 						.get()
 						.uri("http://storage-service/v1/api/storage/{itemId}",
@@ -23,12 +32,15 @@ public class StorageServiceClient {
 						.retrieve()
 						.bodyToMono(Integer.class)
 						.block());
-
-		if (itemQuantity - quantity < 0) {
-			throw new UnacceptableQualityItemsException("Unacceptable quality of items");
-		}
 	}
 
+	/**
+	 * Возвращает количество конкретного товара на склад.
+	 *
+	 * @param itemId       Идентификатор товара для возврата.
+	 * @param quantityItem Количество товара для возврата.
+	 * @return ResponseEntity, содержащий результат операции.
+	 */
 	public ResponseEntity<Object> returnQuantityOfItemToStorage(int itemId, int quantityItem) {
 		return webClientBuilder.build()
 				.put()
@@ -39,6 +51,13 @@ public class StorageServiceClient {
 				.block();
 	}
 
+	/**
+	 * Добавляет количество конкретного товара в корзину покупок.
+	 *
+	 * @param itemId       Идентификатор товара для добавления в корзину.
+	 * @param quantityItem Количество товара для добавления в корзину.
+	 * @return ResponseEntity, содержащий результат операции.
+	 */
 	public ResponseEntity<Object> addItemQuantityToCart(int itemId, int quantityItem) {
 		return webClientBuilder.build()
 				.patch()
