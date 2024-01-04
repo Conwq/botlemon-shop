@@ -1,5 +1,6 @@
 package ru.patseev.itemservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,12 +27,14 @@ public class ItemController {
 	}
 
 	@PostMapping("/add")
-	public ResponseEntity<InfoResponse> addItem(@RequestBody ItemDto itemDto) {
+	public ResponseEntity<InfoResponse> addItem(@Valid
+												@RequestBody ItemDto itemDto) {
 		return itemService.addItem(itemDto);
 	}
 
 	@PutMapping("/edit")
-	public ResponseEntity<InfoResponse> editItem(@RequestBody ItemDto itemDto) {
+	public ResponseEntity<InfoResponse> editItem(@Valid
+												 @RequestBody ItemDto itemDto) {
 		return itemService.editItem(itemDto);
 	}
 

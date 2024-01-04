@@ -15,8 +15,6 @@ import ru.patseev.itemservice.mapper.ItemMapper;
 import ru.patseev.itemservice.repository.ItemRepository;
 
 import java.math.BigDecimal;
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
@@ -59,7 +57,7 @@ public class ItemService {
 	 * Сохраняет предмет в БД и его количество через сторонний клиент Storage.
 	 */
 	public ResponseEntity<InfoResponse> addItem(ItemDto itemDto) {
-		ItemEntity itemEntity = this.createItemEntity(itemDto);
+		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
 		int itemId = itemRepository.save(itemEntity).getId();
 
 		storageServiceClient.saveQuantityItemToStorage(itemId, itemDto.getQuantity());
@@ -141,14 +139,5 @@ public class ItemService {
 		ItemDto itemDto = itemMapper.toDto(itemEntity);
 		itemDto.setQuantity(quantityItem);
 		return itemDto;
-	}
-
-	/*
-	 * Создает сущность Item и меняет у него дату на текущую.
-	 */
-	private ItemEntity createItemEntity(ItemDto itemDto) {
-		ItemEntity itemEntity = itemMapper.toEntity(itemDto);
-		itemEntity.setPublicationDate(Timestamp.from(Instant.now()));
-		return itemEntity;
 	}
 }
