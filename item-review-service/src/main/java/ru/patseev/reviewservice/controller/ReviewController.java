@@ -1,5 +1,6 @@
 package ru.patseev.reviewservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +75,7 @@ public class ReviewController {
 	 */
 	@PostMapping("/add")
 	public ResponseEntity<InfoResponse> addReviewForItem(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
+														 @Valid
 														 @RequestBody FeedbackRequest request) {
 		final String token = header.replace(JwtHeader.BEARER, "");
 		int userId = jwtService.extractUserId(token);
