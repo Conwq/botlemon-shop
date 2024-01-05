@@ -2,6 +2,7 @@ package ru.patseev.authenticationservice.controller;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,6 +22,11 @@ public class AuthenticationExceptionHandlerController {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<ExceptionResponse> methodArgumentNotValidException() {
 		return createResponse("Invalid data", HttpStatus.BAD_REQUEST);
+	}
+
+	@ExceptionHandler(UsernameNotFoundException.class)
+	public ResponseEntity<ExceptionResponse> usernameNotFoundException(UsernameNotFoundException e) {
+		return createResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
 	}
 
 	private ResponseEntity<ExceptionResponse> createResponse(String message, HttpStatus status) {
