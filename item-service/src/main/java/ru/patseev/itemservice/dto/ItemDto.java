@@ -1,7 +1,8 @@
 package ru.patseev.itemservice.dto;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,10 +21,10 @@ public class ItemDto {
 	@NotBlank(message = "Name cannot be empty")
 	private String name;
 	private String description;
-	@Min(value = 0)
+	@PositiveOrZero
 	private BigDecimal price;
 	@Builder.Default
 	private Timestamp publicationDate = Timestamp.from(Instant.now());
-	@Min(value = 0)
+	@PositiveOrZero
 	private Integer quantity;
 }

@@ -1,4 +1,6 @@
 package ru.patseev.authenticationservice.dto;
 
-public record ExceptionResponse (String message){
+import org.springframework.http.HttpStatus;
+
+public record ExceptionResponse (String message, HttpStatus status, String createdAt){
 }

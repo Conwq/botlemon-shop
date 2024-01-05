@@ -1,4 +1,7 @@
 package ru.patseev.authenticationservice.dto;
 
-public record AuthRequest(String email, String username, String password, String firstName, String lastName) {
+import jakarta.validation.constraints.NotBlank;
+
+public record AuthRequest(@NotBlank(message = "Username can`no`t be empty") String username,
+						  @NotBlank(message = "Password can`t be empty") String password) {
 }

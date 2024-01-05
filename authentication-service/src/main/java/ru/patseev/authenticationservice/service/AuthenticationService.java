@@ -11,6 +11,7 @@ import ru.patseev.authenticationservice.domain.UserEntity;
 import ru.patseev.authenticationservice.domain.UserRoles;
 import ru.patseev.authenticationservice.dto.AuthRequest;
 import ru.patseev.authenticationservice.dto.AuthResponse;
+import ru.patseev.authenticationservice.dto.RegisterRequest;
 import ru.patseev.authenticationservice.exception.UserAlreadyExistException;
 import ru.patseev.authenticationservice.repository.RoleRepository;
 import ru.patseev.authenticationservice.repository.UserCredentialRepository;
@@ -29,7 +30,7 @@ public class AuthenticationService {
 	private final EmailSenderClient emailSenderClient;
 
 	@Transactional
-	public void registerUser(AuthRequest request) {
+	public void registerUser(RegisterRequest request) {
 		if (userCredentialRepository.existsByUsername(request.username()) ||
 				userCredentialRepository.existsByEmail(request.email())) {
 			throw new UserAlreadyExistException("This user already exist");
@@ -66,7 +67,7 @@ public class AuthenticationService {
 		userCredentialRepository.save(userEntity);
 	}
 
-	private UserEntity mapToEntity(AuthRequest request) {
+	private UserEntity mapToEntity(RegisterRequest request) {
 		Role role = roleRepository.getRoleByRoleName(UserRoles.USER);
 		String activationCode = UUID.randomUUID().toString();
 
