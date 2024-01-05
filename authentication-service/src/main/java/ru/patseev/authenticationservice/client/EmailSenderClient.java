@@ -5,11 +5,20 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.patseev.authenticationservice.dto.EmailSendRequest;
 
+/**
+ * Клиент для отправки электронных писем.
+ */
 @Component
 @RequiredArgsConstructor
 public class EmailSenderClient {
 	private final WebClient.Builder webClientBuilder;
 
+	/**
+	 * Отправляет электронное письмо для подтверждения аккаунта пользователю.
+	 *
+	 * @param userEmail      Адрес электронной почты пользователя.
+	 * @param activationCode Код активации аккаунта.
+	 */
 	public void sendEmailConfirmingAccountToUser(String userEmail, String activationCode) {
 		EmailSendRequest emailSendRequest = new EmailSendRequest(userEmail, activationCode);
 

@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+/**
+ * Сущность, представляющая пользователя в системе.
+ */
 @Entity
 @Table(schema = "botlemon", name = "users")
 @Data
@@ -20,6 +23,7 @@ public class UserEntity {
 	@Column(name = "user_id")
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
+
 	private String email;
 	private String username;
 	private String password;
@@ -28,10 +32,14 @@ public class UserEntity {
 	private boolean enabled;
 	private Timestamp registrationAt;
 	private String activationCode;
+
 	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private Role role;
 
+	/**
+	 * Устанавливает дату регистрации перед сохранением в базу данных.
+	 */
 	@PrePersist
 	public void setRegistrationDate() {
 		if (registrationAt == null) {
