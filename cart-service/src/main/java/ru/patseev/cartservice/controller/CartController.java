@@ -1,5 +1,6 @@
 package ru.patseev.cartservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -46,6 +47,7 @@ public class CartController {
 	 */
 	@PostMapping
 	public ResponseEntity<InfoResponse> addItemToCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
+													  @Valid
 													  @RequestBody CartRequest request) {
 		String token = header.replace(JwtHeader.BEARER, "");
 		int userId = jwtService.extractUserId(token);

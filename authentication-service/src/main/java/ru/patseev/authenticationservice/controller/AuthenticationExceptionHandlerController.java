@@ -11,7 +11,7 @@ import ru.patseev.authenticationservice.exception.UserAlreadyExistException;
 import java.time.Instant;
 
 @ControllerAdvice
-public class ExceptionHandlerController {
+public class AuthenticationExceptionHandlerController {
 
 	@ExceptionHandler(UserAlreadyExistException.class)
 	public ResponseEntity<ExceptionResponse> userAlreadyExistExceptionHandler(UserAlreadyExistException e) {

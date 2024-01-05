@@ -15,22 +15,13 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserDto {
-
 	private Integer id;
-
 	private String username;
-
 	private String password;
-
 	private String firstName;
-
 	private String lastName;
-
 	private boolean enabled;
-
 	private Timestamp registrationAt;
-
 	private RoleEntity roleEntity;
-
 	private List<ItemEntity> itemList;
 }

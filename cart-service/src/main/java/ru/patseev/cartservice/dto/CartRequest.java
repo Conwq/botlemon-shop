@@ -1,7 +1,7 @@
 package ru.patseev.cartservice.dto;
 
-import lombok.Builder;
+import jakarta.validation.constraints.Positive;
 
-@Builder
-public record CartRequest(int itemId, int quantity) {
+public record CartRequest(int itemId,
+						  @Positive int quantity) {
 }
