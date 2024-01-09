@@ -10,11 +10,18 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Сервис для работы с неактивными аккаунтами.
+ */
 @Service
 @RequiredArgsConstructor
 public class InactiveUserCleanupService {
 	private final UserRepository userRepository;
 
+	/**
+	 * Метод активируется каждую минуту и проверяет неактивные аккаунты.
+	 * В случае, если аккаунт неактивен в течение 10 минут, то удаляет его с БД.
+	 */
 	@Scheduled(fixedRate = 1, timeUnit = TimeUnit.MINUTES)
 	public void checkAndRemoveInactiveUsers() {
 		Timestamp cutoffTime = Timestamp.from(

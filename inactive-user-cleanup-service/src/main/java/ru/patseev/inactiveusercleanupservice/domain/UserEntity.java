@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
 
+/**
+ * Сущность пользователя.
+ */
 @Entity
 @Table(schema = "botlemon", name = "users")
 @Data
