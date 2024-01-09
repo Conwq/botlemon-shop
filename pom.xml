@@ -26,6 +26,7 @@
         <module>api-gateway</module>
         <module>authentication-service</module>
         <module>email-sender-service</module>
+        <module>inactive-user-cleanup-service</module>
     </modules>
 
     <properties>

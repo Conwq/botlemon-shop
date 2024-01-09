@@ -1,4 +1,4 @@
-package ru.patseev.authenticationservice.domain;
+package ru.patseev.inactiveusercleanupservice.domain;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,11 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.sql.Timestamp;
-import java.time.Instant;
 
-/**
- * Сущность, представляющая пользователя в системе.
- */
 @Entity
 @Table(schema = "botlemon", name = "users")
 @Data
@@ -31,17 +27,4 @@ public class UserEntity {
 	private boolean enabled;
 	private Timestamp registrationAt;
 	private String activationCode;
-	@ManyToOne
-	@JoinColumn(name = "role_id")
-	private Role role;
-
-	/**
-	 * Устанавливает дату регистрации перед сохранением в базу данных.
-	 */
-	@PrePersist
-	public void setRegistrationDate() {
-		if (registrationAt == null) {
-			registrationAt = Timestamp.from(Instant.now());
-		}
-	}
 }

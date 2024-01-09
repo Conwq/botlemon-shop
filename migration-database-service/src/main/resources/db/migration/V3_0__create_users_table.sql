@@ -6,6 +6,6 @@ CREATE TABLE botlemon.users
     first_name      VARCHAR(30) NOT NULL,
     last_name       VARCHAR(30) NOT NULL,
     enabled         BOOLEAN   DEFAULT FALSE,
-    registration_at TIMESTAMP DEFAULT NOW(),
+    registration_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() AT TIME ZONE 'Europe/Moscow',
     role_id         INT REFERENCES botlemon.roles (role_id) DEFAULT 2
 );
