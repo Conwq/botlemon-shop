@@ -11,11 +11,20 @@ import ru.patseev.authenticationservice.dto.UserDto;
 
 import java.util.Optional;
 
+/**
+ * Клиент для взаимодействия с сервисом пользователей.
+ */
 @Component
 @RequiredArgsConstructor
 public class UserServiceClient {
+
 	private final WebClient.Builder webClientBuilder;
 
+	/**
+	 * Отправляет данные пользователя для сохранения.
+	 *
+	 * @param userDto Данные пользователя.
+	 */
 	public void sendUserDataForSaving(UserDto userDto) {
 		webClientBuilder.build()
 				.method(HttpMethod.POST)
@@ -26,19 +35,30 @@ public class UserServiceClient {
 				.block();
 	}
 
+	/**
+	 * Отправляет запрос для получения учетных данных пользователя по его имени пользователя.
+	 *
+	 * @param username Имя пользователя.
+	 * @return Optional с учетными данными пользователя.
+	 */
 	public Optional<UserDto> sendRequestToReceiveUserCredentials(String username) {
 		ResponseEntity<Optional<UserDto>> response = webClientBuilder.build()
 				.method(HttpMethod.GET)
 				.uri("http://user-service/v1/api/users/user/{username}", username)
 				.retrieve()
-				.toEntity(new ParameterizedTypeReference<Optional<UserDto>>() {
-				})
+				.toEntity(new ParameterizedTypeReference<Optional<UserDto>>() {})
 				.block();
 
 		assert response != null;
 		return response.getBody();
 	}
 
+	/**
+	 * Отправляет запрос для проверки существования пользователя по его имени пользователя.
+	 *
+	 * @param username Имя пользователя.
+	 * @return true, если пользователь существует, в противном случае - false.
+	 */
 	public boolean sendRequestToCheckExistenceUsername(String username) {
 		String uriWithParameter = String.format("http://user-service/v1/api/users/check_username?username=%s", username);
 
@@ -54,6 +74,12 @@ public class UserServiceClient {
 		return Boolean.TRUE.equals(response.getBody());
 	}
 
+	/**
+	 * Отправляет запрос для проверки существования пользователя по его адресу электронной почты.
+	 *
+	 * @param email Адрес электронной почты пользователя.
+	 * @return true, если пользователь существует, в противном случае - false.
+	 */
 	public boolean sendRequestToCheckExistenceEmail(String email) {
 		String uriWithParameter = String.format("http://user-service/v1/api/users/check_email?email=%s", email);
 
@@ -69,6 +95,12 @@ public class UserServiceClient {
 		return Boolean.TRUE.equals(response.getBody());
 	}
 
+	/**
+	 * Отправляет запрос для активации учетной записи пользователя по коду активации.
+	 *
+	 * @param activationCode Код активации.
+	 * @return true, если активация успешна, в противном случае - false.
+	 */
 	public boolean sendRequestToActivateAccount(String activationCode) {
 		ResponseEntity<Boolean> response = webClientBuilder.build()
 				.method(HttpMethod.GET)

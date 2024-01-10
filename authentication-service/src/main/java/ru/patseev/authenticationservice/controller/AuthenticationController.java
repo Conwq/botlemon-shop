@@ -51,8 +51,7 @@ public class AuthenticationController {
 	 * @return Сообщние об успешной активации аккаунта.
 	 */
 	@GetMapping("/activate/{uuid}")
-	public ResponseEntity<String> activateAccount(@PathVariable("uuid") String activationCode) {
-		String message = authorizationService.activateAccount(activationCode);
-		return ResponseEntity.ok(message);
+	public ResponseEntity<?> activateAccount(@PathVariable("uuid") String activationCode) {
+		return authorizationService.activateAccount(activationCode);
 	}
 }

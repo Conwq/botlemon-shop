@@ -6,6 +6,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Представляет сущность роли в приложении.
+ * Эта сущность отображается на таблицу "roles" в схеме "botlemon".
+ */
 @Entity
 @Table(schema = "botlemon", name = "roles")
 @Data

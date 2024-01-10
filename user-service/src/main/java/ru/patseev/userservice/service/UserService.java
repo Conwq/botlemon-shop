@@ -1,86 +1,49 @@
 package ru.patseev.userservice.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.patseev.userservice.domain.RoleEntity;
-import ru.patseev.userservice.domain.UserEntity;
 import ru.patseev.userservice.dto.UserDto;
-import ru.patseev.userservice.repository.RoleRepository;
-import ru.patseev.userservice.repository.UserRepository;
 
 import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
-public class UserService {
-	private final UserRepository userRepository;
-	private final RoleRepository roleRepository;
+/**
+ * Сервис для управления пользователями.
+ */
+public interface UserService {
+	/**
+	 * Сохраняет информацию о новом пользователе.
+	 *
+	 * @param userDto DTO пользователя для сохранения.
+	 */
+	void saveUser(UserDto userDto);
 
-	@Transactional
-	public void saveUser(UserDto userDto) {
-		UserEntity userEntity = this.mapToEntity(userDto);
+	/**
+	 * Получает учетные данные пользователя по его имени пользователя.
+	 *
+	 * @param username Имя пользователя.
+	 * @return Объект Optional, содержащий учетные данные пользователя (если существует).
+	 */
+	Optional<UserDto> getUserCredentials(String username);
 
-		userRepository.save(userEntity);
-	}
+	/**
+	 * Проверяет существование пользователя по его имени пользователя.
+	 *
+	 * @param username Имя пользователя.
+	 * @return true, если пользователь существует, в противном случае - false.
+	 */
+	boolean checkUserExistenceByUsername(String username);
 
-	@Transactional(readOnly = true)
-	public Optional<UserDto> getUserCredentials(String username) {
-		return userRepository
-				.findByUsername(username)
-				.map(this::mapToDto);
-	}
+	/**
+	 * Проверяет существование пользователя по его адресу электронной почты.
+	 *
+	 * @param email Адрес электронной почты пользователя.
+	 * @return true, если пользователь существует, в противном случае - false.
+	 */
+	boolean checkUserExistenceByEmail(String email);
 
-	@Transactional(readOnly = true)
-	public boolean checkUserExistenceByUsername(String username) {
-		return userRepository.existsByUsername(username);
-	}
-
-	@Transactional(readOnly = true)
-	public boolean checkUserExistenceByEmail(String email) {
-		return userRepository.existsByEmail(email);
-	}
-
-	@Transactional
-	public boolean activateAccount(String activationCode) {
-		Optional<UserEntity> optionalUser = userRepository.findByActivationCode(activationCode);
-
-		if (optionalUser.isPresent()) {
-			UserEntity userEntity = optionalUser.get();
-			userEntity.setEnabled(true);
-			userEntity.setActivationCode(null);
-
-			userRepository.save(userEntity);
-			return true;
-		}
-		return false;
-	}
-
-	private UserEntity mapToEntity(UserDto dto) {
-		RoleEntity role = roleRepository.getRoleByRoleName(dto.role());
-
-		return UserEntity.builder()
-				.email(dto.email())
-				.username(dto.username())
-				.password(dto.password())
-				.firstName(dto.firstName())
-				.lastName(dto.lastName())
-				.role(role)
-				.activationCode(dto.activationCode())
-				.build();
-	}
-
-	private UserDto mapToDto(UserEntity entity) {
-		return new UserDto(
-				entity.getId(),
-				entity.getEmail(),
-				entity.getUsername(),
-				entity.getPassword(),
-				entity.getFirstName(),
-				entity.getLastName(),
-				entity.getRole().getRoleName(),
-				entity.getActivationCode(),
-				entity.isEnabled()
-		);
-	}
+	/**
+	 * Активирует учетную запись пользователя по коду активации.
+	 *
+	 * @param activationCode Код активации.
+	 * @return true, если активация прошла успешно, в противном случае - false.
+	 */
+	boolean activateAccount(String activationCode);
 }

@@ -1,6 +1,7 @@
 package ru.patseev.authenticationservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -71,12 +72,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @throws UsernameNotFoundException если пользователь не найден.
 	 */
 	@Override
-	public String activateAccount(String activationCode) {
+	public ResponseEntity<?> activateAccount(String activationCode) {
 		boolean isActivated = userServiceClient.sendRequestToActivateAccount(activationCode);
 		if (isActivated) {
-			return "Activated";
+			return ResponseEntity.ok( "Activated");
 		}
-		return "Not activated";
+		return ResponseEntity.badRequest().build();
 	}
 
 	/*

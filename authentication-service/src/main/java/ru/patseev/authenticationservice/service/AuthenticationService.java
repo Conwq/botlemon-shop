@@ -1,5 +1,6 @@
 package ru.patseev.authenticationservice.service;
 
+import org.springframework.http.ResponseEntity;
 import ru.patseev.authenticationservice.dto.AuthRequest;
 import ru.patseev.authenticationservice.dto.AuthResponse;
 import ru.patseev.authenticationservice.dto.RegisterRequest;
@@ -31,5 +32,5 @@ public interface AuthenticationService {
 	 * @param activationCode Код активации.
 	 * @return Сообщение об активации аккаунта
 	 */
-	String activateAccount(String activationCode);
+	ResponseEntity<?> activateAccount(String activationCode);
 }

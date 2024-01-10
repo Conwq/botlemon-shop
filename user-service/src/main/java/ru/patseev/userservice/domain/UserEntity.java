@@ -9,6 +9,10 @@ import lombok.NoArgsConstructor;
 import java.sql.Timestamp;
 import java.time.Instant;
 
+/**
+ * Представляет сущность пользователя в приложении.
+ * Эта сущность отображается на таблицу "users" в схеме "botlemon".
+ */
 @Entity
 @Table(schema = "botlemon", name = "users")
 @Data
