@@ -38,10 +38,10 @@ public class AuthenticationController {
 	 * @return Возвращает объект с авторизацией пользователя.
 	 */
 	@PostMapping("/authorization")
-	public ResponseEntity<AuthResponse> authUser(@Valid
-												 @RequestBody AuthRequest request) {
+	public ResponseEntity<?> authUser(@Valid
+									  @RequestBody AuthRequest request) {
 		AuthResponse response = authorizationService.authUser(request);
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(response.token());
 	}
 
 	/**
@@ -52,7 +52,7 @@ public class AuthenticationController {
 	 */
 	@GetMapping("/activate/{uuid}")
 	public ResponseEntity<String> activateAccount(@PathVariable("uuid") String activationCode) {
-		authorizationService.activateAccount(activationCode);
-		return ResponseEntity.ok("Email confirmed");
+		String message = authorizationService.activateAccount(activationCode);
+		return ResponseEntity.ok(message);
 	}
 }

@@ -16,7 +16,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-public class AuthConfiguration {
+public class SecurityConfiguration {
 
 	/**
 	 * Создает и возвращает объект PasswordEncoder для шифрования паролей.

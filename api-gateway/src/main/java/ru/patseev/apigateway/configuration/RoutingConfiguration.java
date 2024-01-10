@@ -62,6 +62,11 @@ public class RoutingConfiguration {
 						p -> p.path("/v1/api/email/**")
 								.uri("lb://email-sender-service")
 				)
+
+
+				//port 5020
+
+
 				//port 8761
 				.route("discovery-server",
 						p -> p.path("/eureka/web")

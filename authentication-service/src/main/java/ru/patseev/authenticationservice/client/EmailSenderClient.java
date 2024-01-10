@@ -1,6 +1,7 @@
 package ru.patseev.authenticationservice.client;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import ru.patseev.authenticationservice.dto.EmailSendRequest;
@@ -24,7 +25,7 @@ public class EmailSenderClient {
 
 		//TODO добавить RabbitMQ вместо вот этой части
 		webClientBuilder.build()
-				.post()
+				.method(HttpMethod.POST)
 				.uri("lb://email-sender-service/v1/api/email/activate_account")
 				.bodyValue(emailSendRequest)
 				.retrieve()

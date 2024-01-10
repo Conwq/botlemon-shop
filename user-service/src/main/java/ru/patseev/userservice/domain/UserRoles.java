@@ -1,4 +1,4 @@
-package ru.patseev.authenticationservice.domain;
+package ru.patseev.userservice.domain;
 
 /**
  * Перечисление, представляющее доступные роли пользователя.

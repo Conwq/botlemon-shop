@@ -27,6 +27,7 @@
         <module>authentication-service</module>
         <module>email-sender-service</module>
         <module>inactive-user-cleanup-service</module>
+        <module>user-service</module>
     </modules>
 
     <properties>
@@ -36,6 +37,14 @@
         <spring-cloud.version>2023.0.0</spring-cloud.version>
         <jwt-service.version>1.0</jwt-service.version>
     </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+        </dependency>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -71,6 +80,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
         </plugins>
     </build>

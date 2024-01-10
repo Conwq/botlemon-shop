@@ -29,6 +29,7 @@ public interface AuthenticationService {
 	 * Активирует аккаунт.
 	 *
 	 * @param activationCode Код активации.
+	 * @return Сообщение об активации аккаунта
 	 */
-	void activateAccount(String activationCode);
+	String activateAccount(String activationCode);
 }

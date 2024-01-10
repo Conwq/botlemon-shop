@@ -4,17 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.patseev.authenticationservice.client.EmailSenderClient;
-import ru.patseev.authenticationservice.domain.Role;
-import ru.patseev.authenticationservice.domain.UserEntity;
-import ru.patseev.authenticationservice.domain.UserRoles;
+import ru.patseev.authenticationservice.client.UserServiceClient;
+import ru.patseev.authenticationservice.dto.UserRoles;
 import ru.patseev.authenticationservice.dto.AuthRequest;
 import ru.patseev.authenticationservice.dto.AuthResponse;
 import ru.patseev.authenticationservice.dto.RegisterRequest;
+import ru.patseev.authenticationservice.dto.UserDto;
 import ru.patseev.authenticationservice.exception.UserAlreadyExistException;
-import ru.patseev.authenticationservice.repository.RoleRepository;
-import ru.patseev.authenticationservice.repository.UserCredentialRepository;
 import ru.patseev.authenticationservice.service.AuthenticationService;
 import ru.patseev.jwtservice.starter.service.JwtService;
 
@@ -27,11 +24,10 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
-	private final UserCredentialRepository userCredentialRepository;
-	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final JwtService jwtService;
 	private final EmailSenderClient emailSenderClient;
+	private final UserServiceClient userServiceClient;
 
 	/**
 	 * Регистрирует и сохраняет пользователя в базе данных.
@@ -40,18 +36,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @throws UserAlreadyExistException если пользователь уже существует.
 	 */
 	@Override
-	@Transactional
 	public void registerUser(RegisterRequest request) {
-		if (userCredentialRepository.existsByUsername(request.username()) ||
-				userCredentialRepository.existsByEmail(request.email())) {
-			throw new UserAlreadyExistException("This user already exists");
-		}
-		UserEntity userEntity = this.mapToEntity(request);
-		userCredentialRepository.save(userEntity);
+		this.checkForUserExistence(request);
 
-		emailSenderClient.sendEmailConfirmingAccountToUser(
-				userEntity.getEmail(),
-				userEntity.getActivationCode());
+		UserDto dto = this.createDto(request);
+		userServiceClient.sendUserDataForSaving(dto);
+		emailSenderClient.sendEmailConfirmingAccountToUser(dto.email(), dto.activationCode());
 	}
 
 	/**
@@ -62,13 +52,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @throws UsernameNotFoundException если пользователь не найден.
 	 */
 	@Override
-	@Transactional(readOnly = true)
 	public AuthResponse authUser(AuthRequest request) {
-		UserEntity userCredential = userCredentialRepository
-				.findByUsername(request.username())
-				.filter(UserEntity::isEnabled)
-				.filter(user -> passwordEncoder.matches(request.password(), user.getPassword()))
+		UserDto userCredential = userServiceClient
+				.sendRequestToReceiveUserCredentials(request.username())
+				.filter(UserDto::enabled)
+				.filter(user -> passwordEncoder.matches(request.password(), user.password()))
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
 		String token = this.generateJsonWebToken(userCredential);
 
 		return new AuthResponse(token);
@@ -81,53 +71,59 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	 * @throws UsernameNotFoundException если пользователь не найден.
 	 */
 	@Override
-	@Transactional
-	public void activateAccount(String activationCode) {
-		UserEntity userEntity = userCredentialRepository
-				.findByActivationCode(activationCode)
-				.orElseThrow(() -> new UsernameNotFoundException(""));
-
-		userEntity.setEnabled(true);
-		userEntity.setActivationCode(null);
-
-		userCredentialRepository.save(userEntity);
-	}
-
-	/*
-	 * Преобразует DTO в Entity.
-	 */
-	private UserEntity mapToEntity(RegisterRequest request) {
-		Role role = roleRepository.getRoleByRoleName(UserRoles.USER);
-		String activationCode = UUID.randomUUID().toString();
-
-		return UserEntity.builder()
-				.email(request.email())
-				.username(request.username())
-				.password(passwordEncoder.encode(request.password()))
-				.firstName(request.firstName())
-				.lastName(request.lastName())
-				.role(role)
-				.activationCode(activationCode)
-				.build();
+	public String activateAccount(String activationCode) {
+		boolean isActivated = userServiceClient.sendRequestToActivateAccount(activationCode);
+		if (isActivated) {
+			return "Activated";
+		}
+		return "Not activated";
 	}
 
 	/*
 	 * Создает и возвращает JWT token.
 	 */
-	private String generateJsonWebToken(UserEntity userCredential) {
+	private String generateJsonWebToken(UserDto userCredential) {
 		return jwtService.generateToken(
 				this.createExtraClaims(userCredential),
-				userCredential.getUsername()
+				userCredential.username()
 		);
 	}
 
 	/*
 	 * Создает дополнительные условия в токен.
 	 */
-	private Map<String, Object> createExtraClaims(UserEntity userCredential) {
+	private Map<String, Object> createExtraClaims(UserDto userCredential) {
 		return Map.of(
-				"userId", userCredential.getId(),
-				"role", userCredential.getRole().getRoleName().name()
+				"userId", userCredential.id(),
+				"role", userCredential.role().name()
 		);
+	}
+
+	//TODO использовать маппер?
+	/*
+	 * Метод, который создает DTO
+	 */
+	private UserDto createDto(RegisterRequest request) {
+		String activationCode = UUID.randomUUID().toString();
+
+		return UserDto.builder()
+				.email(request.email())
+				.username(request.username())
+				.password(passwordEncoder.encode(request.password()))
+				.firstName(request.firstName())
+				.lastName(request.lastName())
+				.role(UserRoles.USER)
+				.activationCode(activationCode)
+				.build();
+	}
+
+	/*
+	 * Проверка на существование пользователя
+	 */
+	private void checkForUserExistence(RegisterRequest request) {
+		if (userServiceClient.sendRequestToCheckExistenceUsername(request.username()) ||
+				userServiceClient.sendRequestToCheckExistenceEmail(request.email())) {
+			throw new UserAlreadyExistException("This user already exist");
+		}
 	}
 }
