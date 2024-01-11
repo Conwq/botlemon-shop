@@ -1,6 +1,5 @@
 package ru.patseev.apigateway.filter;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.http.HttpHeaders;
@@ -16,7 +15,6 @@ import ru.patseev.jwtservice.starter.service.JwtHeader;
  * Фильтр для сервиса аутентификации.
  */
 @Component
-@RequiredArgsConstructor
 public class AuthenticationServiceFilter implements GatewayFilter {
 
 	/**

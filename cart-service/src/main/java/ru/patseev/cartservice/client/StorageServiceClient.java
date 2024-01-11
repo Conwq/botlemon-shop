@@ -27,7 +27,7 @@ public class StorageServiceClient {
 		return Objects.requireNonNull(
 				webClientBuilder.build()
 						.get()
-						.uri("http://storage-service/v1/api/storage/{itemId}",
+						.uri("lb://storage-service/v1/api/storage/{itemId}",
 								uriBuilder -> uriBuilder.build(itemId))
 						.retrieve()
 						.bodyToMono(Integer.class)
@@ -44,7 +44,7 @@ public class StorageServiceClient {
 	public ResponseEntity<Object> returnQuantityOfItemToStorage(int itemId, int quantityItem) {
 		return webClientBuilder.build()
 				.put()
-				.uri("http://storage-service/v1/api/storage/return")
+				.uri("lb://storage-service/v1/api/storage/return")
 				.bodyValue(new StorageRequest(itemId, quantityItem))
 				.retrieve()
 				.toEntity(Object.class)
@@ -61,7 +61,7 @@ public class StorageServiceClient {
 	public ResponseEntity<Object> addItemQuantityToCart(int itemId, int quantityItem) {
 		return webClientBuilder.build()
 				.patch()
-				.uri("http://storage-service/v1/api/storage")
+				.uri("lb://storage-service/v1/api/storage")
 				.bodyValue(new StorageRequest(itemId, quantityItem))
 				.retrieve()
 				.toEntity(Object.class)

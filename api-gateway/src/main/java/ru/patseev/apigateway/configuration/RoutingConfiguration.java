@@ -60,13 +60,15 @@ public class RoutingConfiguration {
 				//port 5018
 				.route("email-sender-service",
 						p -> p.path("/v1/api/email/**")
+								.filters(f -> f.filter(jwtAuthenticationFilter))
 								.uri("lb://email-sender-service")
 				)
-
-
 				//port 5020
-
-
+				.route("user-service",
+						p -> p.path("/v1/api/users/**")
+								.filters(f -> f.filter(jwtAuthenticationFilter))
+								.uri("lb://user-service")
+				)
 				//port 8761
 				.route("discovery-server",
 						p -> p.path("/eureka/web")

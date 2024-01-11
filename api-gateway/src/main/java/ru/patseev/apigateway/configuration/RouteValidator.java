@@ -1,6 +1,5 @@
 package ru.patseev.apigateway.configuration;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +12,6 @@ import java.util.function.Predicate;
  * Класс предназначенный для обработки маршрутов.
  */
 @Component
-@RequiredArgsConstructor
 public class RouteValidator {
 	private static final Set<String> NO_ACCESS = Set.of("NO_ACCESS"); //Напрямую к сервисам с такой ролью доступ получить нельзя, только через сторонние сервисы.
 	private static final Set<String> ADMIN_ROLE = Set.of("ADMIN");
@@ -53,7 +51,8 @@ public class RouteValidator {
 			"/v1/api/review/edit", ALL_ROLES,
 
 			"/v1/api/email", NO_ACCESS,
-			"/v1/api/storage", NO_ACCESS
+			"/v1/api/storage", NO_ACCESS,
+			"/v1/api/users", NO_ACCESS
 	);
 
 	/**

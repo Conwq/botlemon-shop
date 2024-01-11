@@ -17,7 +17,6 @@ import java.util.Optional;
 @Component
 @RequiredArgsConstructor
 public class UserServiceClient {
-
 	private final WebClient.Builder webClientBuilder;
 
 	/**
@@ -44,7 +43,7 @@ public class UserServiceClient {
 	public Optional<UserDto> sendRequestToReceiveUserCredentials(String username) {
 		ResponseEntity<Optional<UserDto>> response = webClientBuilder.build()
 				.method(HttpMethod.GET)
-				.uri("http://user-service/v1/api/users/user/{username}", username)
+				.uri("lb://user-service/v1/api/users/user/{username}", username)
 				.retrieve()
 				.toEntity(new ParameterizedTypeReference<Optional<UserDto>>() {})
 				.block();
@@ -60,7 +59,7 @@ public class UserServiceClient {
 	 * @return true, если пользователь существует, в противном случае - false.
 	 */
 	public boolean sendRequestToCheckExistenceUsername(String username) {
-		String uriWithParameter = String.format("http://user-service/v1/api/users/check_username?username=%s", username);
+		String uriWithParameter = String.format("lb://user-service/v1/api/users/check_username?username=%s", username);
 
 		ResponseEntity<Boolean> response = webClientBuilder.build()
 				.method(HttpMethod.GET)
@@ -81,7 +80,7 @@ public class UserServiceClient {
 	 * @return true, если пользователь существует, в противном случае - false.
 	 */
 	public boolean sendRequestToCheckExistenceEmail(String email) {
-		String uriWithParameter = String.format("http://user-service/v1/api/users/check_email?email=%s", email);
+		String uriWithParameter = String.format("lb://user-service/v1/api/users/check_email?email=%s", email);
 
 		ResponseEntity<Boolean> response = webClientBuilder.build()
 				.method(HttpMethod.GET)
@@ -104,7 +103,7 @@ public class UserServiceClient {
 	public boolean sendRequestToActivateAccount(String activationCode) {
 		ResponseEntity<Boolean> response = webClientBuilder.build()
 				.method(HttpMethod.GET)
-				.uri("http://user-service/v1/api/users/activate_account/{activationCode}", activationCode)
+				.uri("lb://user-service/v1/api/users/activate_account/{activationCode}", activationCode)
 				.contentType(MediaType.APPLICATION_JSON)
 				.retrieve()
 				.toEntity(Boolean.class)
