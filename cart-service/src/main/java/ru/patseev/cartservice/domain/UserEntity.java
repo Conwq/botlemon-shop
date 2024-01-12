@@ -36,11 +36,6 @@ public class UserEntity {
 			orphanRemoval = true)
 	private List<CartEntity> cartEntities;
 
-	@Override
-	public String toString() {
-		return String.format("User: id -> %s, user -> %s", id, username);
-	}
-
 	public List<CartEntity> getCartEntities() {
 		if (cartEntities == null) {
 			return new ArrayList<>();

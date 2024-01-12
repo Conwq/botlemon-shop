@@ -24,6 +24,7 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@Transactional
 	public void saveUser(UserDto userDto) {
 		UserEntity userEntity = this.mapToEntity(userDto);
@@ -34,6 +35,7 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@Transactional(readOnly = true)
 	public Optional<UserDto> getUserCredentials(String username) {
 		return userRepository
@@ -44,6 +46,7 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@Transactional(readOnly = true)
 	public boolean checkUserExistenceByUsername(String username) {
 		return userRepository.existsByUsername(username);
@@ -60,6 +63,7 @@ public class UserServiceImpl implements UserService {
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	@Transactional
 	public boolean activateAccount(String activationCode) {
 		Optional<UserEntity> optionalUser = userRepository.findByActivationCode(activationCode);

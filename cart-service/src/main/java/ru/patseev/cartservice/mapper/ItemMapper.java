@@ -6,8 +6,6 @@ import ru.patseev.cartservice.dto.ItemDto;
 
 @Mapper(componentModel = "spring")
 public interface ItemMapper {
-
 	ItemEntity toEntity(ItemDto itemDto);
-
 	ItemDto toDto(ItemEntity itemEntity);
 }

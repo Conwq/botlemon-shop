@@ -24,4 +24,11 @@ public class ItemEntity {
 	private String description;
 	private BigDecimal price;
 	private Timestamp publicationDate;
+
+	@PrePersist
+	public void saveDescription() {
+		if (description == null || description.trim().isEmpty()) {
+			description = "No description";
+		}
+	}
 }
