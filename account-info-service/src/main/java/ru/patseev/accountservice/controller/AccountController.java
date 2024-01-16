@@ -27,7 +27,17 @@ public class AccountController {
 
 	@PostMapping("/create/{userId}")
 	public ResponseEntity<Object> addAccountDetails(@PathVariable int userId) {
-		accountService.addAccountDetails(userId);
-		return ResponseEntity.ok().build();
+		if(accountService.addAccountDetails(userId)) {
+			return ResponseEntity.ok().build();
+		}
+		return ResponseEntity.badRequest().build();
+	}
+
+	@PatchMapping("/update_login_date/{userId}")
+	public ResponseEntity<Object> updateLastLoginDate(@PathVariable int userId) {
+		if (accountService.updateLastLoginDate(userId)) {
+			return ResponseEntity.ok().build();
+		}
+		return ResponseEntity.badRequest().build();
 	}
 }

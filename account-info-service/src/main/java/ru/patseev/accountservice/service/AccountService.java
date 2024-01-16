@@ -20,5 +20,12 @@ public interface AccountService {
 	 *
 	 * @param userId Идентификатор пользователя.
 	 */
-	void addAccountDetails(int userId);
+	boolean addAccountDetails(int userId);
+
+	/**
+	 * Обновляет дату последнего входа в аккаунт.
+	 *
+	 * @param userId Идентификатор пользователя.
+	 */
+	boolean updateLastLoginDate(int userId);
 }

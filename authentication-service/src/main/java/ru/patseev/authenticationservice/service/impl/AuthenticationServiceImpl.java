@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import ru.patseev.authenticationservice.client.AccountServiceClient;
 import ru.patseev.authenticationservice.client.EmailSenderClient;
 import ru.patseev.authenticationservice.client.UserServiceClient;
 import ru.patseev.authenticationservice.dto.UserRoles;
@@ -26,6 +27,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final JwtService jwtService;
 	private final EmailSenderClient emailSenderClient;
 	private final UserServiceClient userServiceClient;
+	private final AccountServiceClient accountServiceClient;
 
 	@Override
 	public void registerUser(RegisterRequest request) {
@@ -45,7 +47,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 				.orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
 		String token = this.generateJsonWebToken(userCredential);
-
+		accountServiceClient.sendRequestToUpdateLastLoginDate(userCredential.id());
 		return new AuthResponse(token);
 	}
 

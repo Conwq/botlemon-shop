@@ -37,9 +37,21 @@ public class AccountServiceImpl implements AccountService {
 
 	@Override
 	@Transactional
-	public void addAccountDetails(int userId) {
+	public boolean addAccountDetails(int userId) {
 		AccountDetailsEntity accountDetails = this.createAccountDetailsEntity(userId);
 		accountDetailsRepository.save(accountDetails);
+		return true;
+	}
+
+	@Override
+	@Transactional
+	public boolean updateLastLoginDate(int userId) {
+		AccountDetailsEntity accountDetailsEntity = accountDetailsRepository.
+				findByUserId(userId)
+				.orElseThrow();
+		accountDetailsEntity.setLastLoginDate(Timestamp.from(Instant.now()));
+		accountDetailsRepository.save(accountDetailsEntity);
+		return true;
 	}
 
 	/*
