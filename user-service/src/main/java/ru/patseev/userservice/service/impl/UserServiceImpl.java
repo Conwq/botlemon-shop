@@ -3,6 +3,7 @@ package ru.patseev.userservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.patseev.userservice.client.AccountServiceClient;
 import ru.patseev.userservice.domain.RoleEntity;
 import ru.patseev.userservice.domain.UserEntity;
 import ru.patseev.userservice.dto.UserDto;
@@ -12,29 +13,20 @@ import ru.patseev.userservice.service.UserService;
 
 import java.util.Optional;
 
-/**
- * Реализация интерфейса UserService.
- */
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 	private final UserRepository userRepository;
 	private final RoleRepository roleRepository;
+	private final AccountServiceClient accountServiceClient;
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Transactional
 	public void saveUser(UserDto userDto) {
 		UserEntity userEntity = this.mapToEntity(userDto);
-
 		userRepository.save(userEntity);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Transactional(readOnly = true)
 	public Optional<UserDto> getUserCredentials(String username) {
@@ -43,26 +35,18 @@ public class UserServiceImpl implements UserService {
 				.map(this::mapToDto);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Transactional(readOnly = true)
 	public boolean checkUserExistenceByUsername(String username) {
 		return userRepository.existsByUsername(username);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
+	@Override
 	@Transactional(readOnly = true)
 	public boolean checkUserExistenceByEmail(String email) {
 		return userRepository.existsByEmail(email);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Transactional
 	public boolean activateAccount(String activationCode) {
@@ -74,6 +58,7 @@ public class UserServiceImpl implements UserService {
 			userEntity.setActivationCode(null);
 
 			userRepository.save(userEntity);
+			accountServiceClient.sendRequestToCreatePersonalAccountDetails(userEntity.getId());
 			return true;
 		}
 		return false;
@@ -108,6 +93,7 @@ public class UserServiceImpl implements UserService {
 				entity.getFirstName(),
 				entity.getLastName(),
 				entity.getRole().getRoleName(),
+				entity.getRegistrationAt(),
 				entity.getActivationCode(),
 				entity.isEnabled()
 		);

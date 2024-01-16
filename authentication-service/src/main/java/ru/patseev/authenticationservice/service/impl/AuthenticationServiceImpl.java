@@ -19,9 +19,6 @@ import ru.patseev.jwtservice.starter.service.JwtService;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * Реализация сервиса аутентификации и регистрации пользователя.
- */
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -30,12 +27,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	private final EmailSenderClient emailSenderClient;
 	private final UserServiceClient userServiceClient;
 
-	/**
-	 * Регистрирует и сохраняет пользователя в базе данных.
-	 *
-	 * @param request Запрос на регистрацию пользователя.
-	 * @throws UserAlreadyExistException если пользователь уже существует.
-	 */
 	@Override
 	public void registerUser(RegisterRequest request) {
 		this.checkForUserExistence(request);
@@ -45,13 +36,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		emailSenderClient.sendEmailConfirmingAccountToUser(dto.email(), dto.activationCode());
 	}
 
-	/**
-	 * Аутентифицирует и авторизует пользователя.
-	 *
-	 * @param request Запрос на авторизацию пользователя.
-	 * @return Возвращает объект с токеном.
-	 * @throws UsernameNotFoundException если пользователь не найден.
-	 */
 	@Override
 	public AuthResponse authUser(AuthRequest request) {
 		UserDto userCredential = userServiceClient
@@ -65,12 +49,6 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 		return new AuthResponse(token);
 	}
 
-	/**
-	 * Активирует аккаунт пользователя.
-	 *
-	 * @param activationCode Код активации.
-	 * @throws UsernameNotFoundException если пользователь не найден.
-	 */
 	@Override
 	public ResponseEntity<?> activateAccount(String activationCode) {
 		boolean isActivated = userServiceClient.sendRequestToActivateAccount(activationCode);

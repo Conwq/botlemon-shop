@@ -33,8 +33,11 @@ public class JwtService {
 	}
 
 	public String extractUserRole(String token) {
-		return extractClaim(token,
-				claim -> claim.get("role", String.class));
+		return extractClaim(token, claim -> claim.get("role", String.class));
+	}
+
+	public String extractUsername(String token) {
+		return extractClaim(token, Claims::getSubject);
 	}
 
 	private Claims extractAllClaims(String token) {

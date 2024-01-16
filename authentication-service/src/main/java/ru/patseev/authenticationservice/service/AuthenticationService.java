@@ -1,20 +1,22 @@
 package ru.patseev.authenticationservice.service;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import ru.patseev.authenticationservice.dto.AuthRequest;
 import ru.patseev.authenticationservice.dto.AuthResponse;
 import ru.patseev.authenticationservice.dto.RegisterRequest;
+import ru.patseev.authenticationservice.exception.UserAlreadyExistException;
 
 /**
- * Сервис отвечающий для работы с авторизацией и регистрацией пользователя
+ * Сервис отвечающий за работу с авторизацией и регистрацией пользователя
  */
 public interface AuthenticationService {
 
 	/**
-	 * Регистрация и сохранение пользователя в БД.
-	 * Через сторонний клиент отправляет подтверждающий код.
+	 * Регистрирует и сохраняет пользователя в базе данных.
 	 *
 	 * @param request Запрос на регистрацию пользователя.
+	 * @throws UserAlreadyExistException если пользователь уже существует.
 	 */
 	void registerUser(RegisterRequest request);
 
@@ -23,14 +25,15 @@ public interface AuthenticationService {
 	 *
 	 * @param request Запрос на авторизацию пользователя.
 	 * @return Возвращает объект с токеном.
+	 * @throws UsernameNotFoundException если пользователь не найден.
 	 */
 	AuthResponse authUser(AuthRequest request);
 
 	/**
-	 * Активирует аккаунт.
+	 * Активирует аккаунт пользователя.
 	 *
 	 * @param activationCode Код активации.
-	 * @return Сообщение об активации аккаунта
+	 * @throws UsernameNotFoundException если пользователь не найден.
 	 */
 	ResponseEntity<?> activateAccount(String activationCode);
 }

@@ -1,6 +1,6 @@
-package ru.patseev.authenticationservice.dto;
+package ru.patseev.accountservice.dto;
 
-import lombok.Builder;
+import java.sql.Timestamp;
 
 /**
  * Data Transfer Object (DTO) представляющий пользователя.
@@ -12,24 +12,25 @@ import lombok.Builder;
  *
  * <p>Класс создан как "record" (запись), предоставляя компактный и неизменяемый способ представления данных.</p>
  *
- * @param id Идентификатор пользователя.
- * @param email Электронная почта пользователя.
- * @param username Имя пользователя.
- * @param password Пароль пользователя.
- * @param firstName Имя пользователя.
- * @param lastName Фамилия пользователя.
- * @param role Роль пользователя.
+ * @param id             Идентификатор пользователя.
+ * @param email          Электронная почта пользователя.
+ * @param username       Имя пользователя.
+ * @param password       Пароль пользователя.
+ * @param firstName      Имя пользователя.
+ * @param lastName       Фамилия пользователя.
+ * @param role           Роль пользователя.
  * @param activationCode Код активации учетной записи пользователя.
- * @param enabled Показатель активности учетной записи.
+ * @param enabled        Показатель активности учетной записи.
  */
-@Builder
-public record UserDto (Integer id,
-					   String email,
-					   String username,
-					   String password,
-					   String firstName,
-					   String lastName,
-					   UserRoles role,
-					   String activationCode,
-					   Boolean enabled) {
+public record UserDto(Integer id,
+					  String email,
+					  String username,
+					  String password,
+					  String firstName,
+					  String lastName,
+					  String registrationAt
+//					  UserRoles role
+//					  String activationCode,
+//					  Boolean enabled
+) {
 }

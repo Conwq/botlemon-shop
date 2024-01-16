@@ -1,11 +1,11 @@
-package ru.patseev.migrationdatabaseservice;
+package ru.patseev.accountservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class MigrationApplication {
+public class AccountApplication {
 	public static void main(String[] args) {
-		SpringApplication.run(MigrationApplication.class, args);
+		SpringApplication.run(AccountApplication.class, args);
 	}
 }

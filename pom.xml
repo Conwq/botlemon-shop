@@ -28,6 +28,7 @@
         <module>email-sender-service</module>
         <module>inactive-user-cleanup-service</module>
         <module>user-service</module>
+        <module>account-info-service</module>
     </modules>
 
     <properties>

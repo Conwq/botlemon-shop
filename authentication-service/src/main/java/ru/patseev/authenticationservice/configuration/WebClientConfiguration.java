@@ -10,7 +10,6 @@ import org.springframework.web.reactive.function.client.WebClient;
  * Конфигурация WebClient для взаимодействия с другими сервисами.
  */
 @Configuration
-@EnableWebFlux
 public class WebClientConfiguration {
 
 	/**

@@ -56,9 +56,7 @@ public class ReviewController {
 	 * @return Список обзоров от пользователей.
 	 */
 	@GetMapping("/user_reviews")
-	public ResponseEntity<List<ReviewResponse>> getAllReviewsFromSpecificUser(
-			@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
-
+	public ResponseEntity<List<ReviewResponse>> getAllReviewsFromSpecificUser(@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
 		final String token = header.replace(JwtHeader.BEARER, "");
 		int userId = jwtService.extractUserId(token);
 
