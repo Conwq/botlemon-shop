@@ -38,7 +38,7 @@ public class AuthenticationController {
 	 * @return Возвращает объект с авторизацией пользователя.
 	 */
 	@PostMapping("/authorization")
-	public ResponseEntity<?> authUser(@Valid
+	public ResponseEntity<String> authUser(@Valid
 									  @RequestBody AuthRequest request) {
 		AuthResponse response = authorizationService.authUser(request);
 		return ResponseEntity.ok(response.token());
@@ -48,7 +48,7 @@ public class AuthenticationController {
 	 * Активирует аккаунт пользователя.
 	 *
 	 * @param activationCode Код активации.
-	 * @return Сообщние об успешной активации аккаунта.
+	 * @return Сообщение об успешной активации аккаунта.
 	 */
 	@GetMapping("/activate/{uuid}")
 	public ResponseEntity<?> activateAccount(@PathVariable("uuid") String activationCode) {

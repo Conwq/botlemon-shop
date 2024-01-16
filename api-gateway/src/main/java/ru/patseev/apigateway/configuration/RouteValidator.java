@@ -3,6 +3,7 @@ package ru.patseev.apigateway.configuration;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -13,7 +14,8 @@ import java.util.function.Predicate;
  */
 @Component
 public class RouteValidator {
-	private static final Set<String> NO_ACCESS = Set.of("NO_ACCESS"); //Напрямую к сервисам с такой ролью доступ получить нельзя, только через сторонние сервисы.
+	//Напрямую к сервисам с такой ролью доступ получить нельзя, только через сторонние сервисы.
+	private static final Set<String> NO_ACCESS = Set.of("NO_ACCESS");
 	private static final Set<String> ADMIN_ROLE = Set.of("ADMIN");
 	private static final Set<String> ALL_ROLES = Set.of("USER", "ADMIN");
 
@@ -40,20 +42,22 @@ public class RouteValidator {
 	/**
 	 * Набор закрытых конечных точек, для которых требуется определенные роли пользователей для доступа.
 	 */
-	private final Map<String, Set<String>> closeApiEndpoints = Map.of(
-			"/v1/api/items/add", ADMIN_ROLE,
-			"/v1/api/items/edit", ADMIN_ROLE,
-			"/v1/api/items/delete/", ADMIN_ROLE,
+	private final Map<String, Set<String>> closeApiEndpoints = new HashMap<>()
+	{{
+		put("/v1/api/items/add", ADMIN_ROLE);
+		put("/v1/api/items/edit", ADMIN_ROLE);
+		put("/v1/api/items/delete/", ADMIN_ROLE);
 
-			"v1/api/cart", ALL_ROLES,
+		put("v1/api/cart", ALL_ROLES);
+		put("/v1/api/review/add", ALL_ROLES);
+		put("/v1/api/review/edit", ALL_ROLES);
+		put("v1/api/account/details", ALL_ROLES);
 
-			"/v1/api/review/add", ALL_ROLES,
-			"/v1/api/review/edit", ALL_ROLES,
-
-			"/v1/api/email", NO_ACCESS,
-			"/v1/api/storage", NO_ACCESS,
-			"/v1/api/users", NO_ACCESS
-	);
+		put("/v1/api/email", NO_ACCESS);
+		put("/v1/api/storage", NO_ACCESS);
+		put("/v1/api/users", NO_ACCESS);
+		put("v1/api/account/create", NO_ACCESS);
+	}};
 
 	/**
 	 * Предикат для проверки конечной точки, является ли она открытой или закрытой.

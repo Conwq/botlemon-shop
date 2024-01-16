@@ -69,6 +69,11 @@ public class RoutingConfiguration {
 								.filters(f -> f.filter(jwtAuthenticationFilter))
 								.uri("lb://user-service")
 				)
+				//port 5021
+				.route("account-service",
+						p -> p.path("/v1/api/account/**")
+								.filters(f -> f.filter(jwtAuthenticationFilter))
+								.uri("lb://account-service"))
 				//port 8761
 				.route("discovery-server",
 						p -> p.path("/eureka/web")
