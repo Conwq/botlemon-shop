@@ -8,11 +8,7 @@ import org.springframework.stereotype.Service;
 import ru.patseev.authenticationservice.client.AccountServiceClient;
 import ru.patseev.authenticationservice.client.EmailSenderClient;
 import ru.patseev.authenticationservice.client.UserServiceClient;
-import ru.patseev.authenticationservice.dto.UserRoles;
-import ru.patseev.authenticationservice.dto.AuthRequest;
-import ru.patseev.authenticationservice.dto.AuthResponse;
-import ru.patseev.authenticationservice.dto.RegisterRequest;
-import ru.patseev.authenticationservice.dto.UserDto;
+import ru.patseev.authenticationservice.dto.*;
 import ru.patseev.authenticationservice.exception.UserAlreadyExistException;
 import ru.patseev.authenticationservice.service.AuthenticationService;
 import ru.patseev.jwtservice.starter.service.JwtService;
@@ -35,7 +31,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
 		UserDto dto = this.createDto(request);
 		userServiceClient.sendUserDataForSaving(dto);
-		emailSenderClient.sendEmailConfirmingAccountToUser(dto.email(), dto.activationCode());
+		emailSenderClient.sendEmailConfirmingAccountToUser(
+				dto.email(),
+				dto.activationCode()
+		);
 	}
 
 	@Override
@@ -55,7 +54,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 	public ResponseEntity<?> activateAccount(String activationCode) {
 		boolean isActivated = userServiceClient.sendRequestToActivateAccount(activationCode);
 		if (isActivated) {
-			return ResponseEntity.ok( "Activated");
+			return ResponseEntity.ok("Activated");
 		}
 		return ResponseEntity.badRequest().build();
 	}
