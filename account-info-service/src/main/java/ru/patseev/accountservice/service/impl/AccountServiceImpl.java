@@ -61,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
 		return AccountDetailsEntity.builder()
 				.lastLoginDate(Timestamp.from(Instant.now()))
 				.totalPurchaseAmount(BigDecimal.ZERO)
-				.bonusPoints(0)
+				.discountPercentage(0)
 				.userId(userId)
 				.build();
 	}
@@ -75,10 +75,10 @@ public class AccountServiceImpl implements AccountService {
 				userDto.username(),
 				userDto.firstName(),
 				userDto.lastName(),
-				userDto.registrationAt(),
+				userDto.registrationAt().toString(),
 				accountDetailsEntity.getLastLoginDate().toString(),
 				accountDetailsEntity.getTotalPurchaseAmount(),
-				accountDetailsEntity.getBonusPoints()
+				accountDetailsEntity.getDiscountPercentage()
 		);
 	}
 }

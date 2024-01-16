@@ -9,5 +9,5 @@ public record AccountDto(String email,
 						 String registrationAt,
 						 String lastLoginDate,
 						 BigDecimal totalPurchaseAmount,
-						 Integer bonusPoints) {
+						 Integer discountPercentage) {
 }

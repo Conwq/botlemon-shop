@@ -18,9 +18,6 @@ import java.sql.Timestamp;
  * @param password       Пароль пользователя.
  * @param firstName      Имя пользователя.
  * @param lastName       Фамилия пользователя.
- * @param role           Роль пользователя.
- * @param activationCode Код активации учетной записи пользователя.
- * @param enabled        Показатель активности учетной записи.
  */
 public record UserDto(Integer id,
 					  String email,
@@ -28,9 +25,6 @@ public record UserDto(Integer id,
 					  String password,
 					  String firstName,
 					  String lastName,
-					  String registrationAt
-//					  UserRoles role
-//					  String activationCode,
-//					  Boolean enabled
+					  Timestamp registrationAt
 ) {
 }

@@ -24,8 +24,8 @@ public class AccountDetailsEntity {
 	private Timestamp lastLoginDate;
 	@Column(name = "total_purchase_amount")
 	private BigDecimal totalPurchaseAmount;
-	@Column(name = "bonus_points")
-	private Integer bonusPoints;
+	@Column(name = "discount_percentage")
+	private Integer discountPercentage;
 	@Column(name = "user_id")
 	private Integer userId;
 }
