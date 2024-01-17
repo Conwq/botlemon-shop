@@ -33,10 +33,6 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-        <dependency>
             <groupId>ru.patseev</groupId>
             <artifactId>jwt-service-spring-boot-starter</artifactId>
         </dependency>
