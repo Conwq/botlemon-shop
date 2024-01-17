@@ -27,4 +27,6 @@ public class ItemDto {
 	private Timestamp publicationDate = Timestamp.from(Instant.now());
 	@PositiveOrZero
 	private Integer quantity;
+	private BigDecimal discountAmount;
+	private BigDecimal discountedPrice;
 }

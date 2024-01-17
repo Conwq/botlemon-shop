@@ -26,9 +26,6 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * Реализует интерфейс CartService
- */
 @Service
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
@@ -38,9 +35,6 @@ public class CartServiceImpl implements CartService {
 	private final ItemMapper itemMapper;
 	private final StorageServiceClient storageServiceClient;
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Transactional(readOnly = true)
 	public List<ItemDto> getUsersShoppingCart(int userId) {
@@ -51,9 +45,6 @@ public class CartServiceImpl implements CartService {
 				.collect(Collectors.toList());
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Transactional
 	public ResponseEntity<InfoResponse> addItemToUsersShoppingCart(int userId, CartRequest request) {
@@ -79,9 +70,6 @@ public class CartServiceImpl implements CartService {
 		return createResponse(Actions.ADD, HttpStatus.CREATED);
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
 	@Override
 	@Transactional
 	public ResponseEntity<InfoResponse> removeItemFromUsersShoppingCart(int userId, CartRequest request) {

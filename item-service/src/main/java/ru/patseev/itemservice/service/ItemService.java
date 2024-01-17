@@ -1,6 +1,7 @@
 package ru.patseev.itemservice.service;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
 import ru.patseev.itemservice.dto.InfoResponse;
 import ru.patseev.itemservice.dto.ItemDto;
 
@@ -15,16 +16,18 @@ public interface ItemService {
 	 * Получает предмет по идентификатору.
 	 *
 	 * @param itemId Идентификатор предмета.
+	 * @param header Заголовок авторизации. Он может быть null.
 	 * @return Возвращает предмет.
 	 */
-	ItemDto getItemById(int itemId);
+	ItemDto getItemById(int itemId, @Nullable String header);
 
 	/**
 	 * Получает все доступные предметы.
 	 *
+	 * @param header Заголовок авторизации. Он может быть null.
 	 * @return Список предметов.
 	 */
-	List<ItemDto> getAllItems();
+	List<ItemDto> getAllItems(@Nullable String header);
 
 	/**
 	 * Сохраняет предмет в БД и его количество через сторонний клиент Storage.
