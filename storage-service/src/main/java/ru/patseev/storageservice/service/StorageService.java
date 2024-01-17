@@ -1,84 +1,61 @@
 package ru.patseev.storageservice.service;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import ru.patseev.storageservice.domain.StorageEntity;
-import ru.patseev.storageservice.repository.ItemRepository;
-import ru.patseev.storageservice.repository.StorageRepository;
 
-@Service
-@RequiredArgsConstructor
-public class StorageService {
-	private final StorageRepository storageRepository;
-	private final ItemRepository itemRepository;
+/**
+ * Сервиса управления складом товаров.
+ */
+public interface StorageService {
 
-	@Transactional(readOnly = true)
-	public Integer getQuantityForItem(int itemId) {
-		return storageRepository
-				.findByItemId(itemId)
-				.map(StorageEntity::getQuantity)
-				.orElse(null);
-	}
+	/**
+	 * Получает количество товара на складе по его идентификатору.
+	 *
+	 * @param itemId идентификатор товара
+	 * @return количество товара на складе или {@code null}, если товар не найден
+	 */
+	Integer getQuantityForItem(int itemId);
 
-	@Transactional
-	public ResponseEntity<Object> addQuantityItemToStorage(int itemId, int quantity) {
-		return itemRepository
-				.findById(itemId)
-				.map(itemEntity -> {
-					StorageEntity storageEntity = StorageEntity.builder()
-							.item(itemEntity)
-							.quantity(quantity).build();
-					itemEntity.setStorage(storageEntity);
-					storageRepository.save(storageEntity);
-					return ResponseEntity.ok().build();
-				})
-				.orElse(ResponseEntity.notFound().build());
-	}
+	/**
+	 * Добавляет указанное количество товара на склад.
+	 *
+	 * @param itemId   идентификатор товара
+	 * @param quantity количество товара для добавления
+	 * @return {@link ResponseEntity} с результатом операции
+	 */
+	ResponseEntity<Object> addQuantityItemToStorage(int itemId, int quantity);
 
-	@Transactional
-	public ResponseEntity<Object> editItemQuantity(int itemId, int quantity) {
-		return storageRepository
-				.findByItemId(itemId)
-				.map(storageEntity -> {
-					storageEntity.setQuantity(quantity);
-					return ResponseEntity.ok().build();
-				})
-				.orElse(ResponseEntity.notFound().build());
-	}
+	/**
+	 * Изменяет количество товара на складе.
+	 *
+	 * @param itemId   идентификатор товара
+	 * @param quantity новое количество товара
+	 * @return {@link ResponseEntity} с результатом операции
+	 */
+	ResponseEntity<Object> editItemQuantity(int itemId, int quantity);
 
-	@Transactional
-	public ResponseEntity<Object> removeItemQuantityFromStorage(int itemId) {
-		return storageRepository
-				.findByItemId(itemId)
-				.map(storageEntity -> {
-					storageRepository.delete(storageEntity);
-					return ResponseEntity.ok().build();
-				})
-				.orElse(ResponseEntity.notFound().build());
-	}
+	/**
+	 * Удаляет товар из хранилища по его идентификатору.
+	 *
+	 * @param itemId идентификатор товара
+	 * @return {@link ResponseEntity} с результатом операции
+	 */
+	ResponseEntity<Object> removeItemQuantityFromStorage(int itemId);
 
-	@Transactional
-	public ResponseEntity<Object> returnQuantityOfItemFromCartToStorage(int itemId, int quantity) {
-		Integer itemQuantity = this.getQuantityForItem(itemId);
-		if (itemQuantity == null) {
-			return ResponseEntity.notFound().build();
-		}
-		int newItemQuantity = quantity + itemQuantity;
-		return this.editItemQuantity(itemId, newItemQuantity);
-	}
+	/**
+	 * Возвращает указанное количество товара из корзины на склад.
+	 *
+	 * @param itemId   идентификатор товара
+	 * @param quantity количество товара для возврата
+	 * @return {@link ResponseEntity} с результатом операции
+	 */
+	ResponseEntity<Object> returnQuantityOfItemFromCartToStorage(int itemId, int quantity);
 
-	//TODO переписать логику по проверки доступности количества товара тут, для того чтобы не обращаться 2 раза в этот сервис
-	@Transactional
-	public ResponseEntity<Object> addItemQuantityToCart(int itemId, int quantity) {
-		return storageRepository
-				.findByItemId(itemId)
-				.map(storageEntity -> {
-					int newQuantity = storageEntity.getQuantity() - quantity;
-					storageEntity.setQuantity(newQuantity);
-					return ResponseEntity.ok().build();
-				})
-				.orElse(ResponseEntity.notFound().build());
-	}
+	/**
+	 * Добавляет указанное количество товара в корзину, уменьшая его количество на складе.
+	 *
+	 * @param itemId   идентификатор товара
+	 * @param quantity количество товара для добавления в корзину
+	 * @return {@link ResponseEntity} с результатом операции
+	 */
+	ResponseEntity<Object> addItemQuantityToCart(int itemId, int quantity);
 }

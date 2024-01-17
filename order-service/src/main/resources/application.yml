@@ -1,0 +1,6 @@
+server:
+  port: 5022
+
+spring:
+  application:
+    name: order-service
