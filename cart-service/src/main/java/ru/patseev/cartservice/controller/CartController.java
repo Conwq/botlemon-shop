@@ -27,13 +27,12 @@ public class CartController {
 	/**
 	 * Возвращает корзину с покупками пользователя.
 	 *
-	 * @param header Заголовок Authorization, который содержит в себе JSON Web Token.
+	 * @param authHeader Заголовок Authorization, который содержит в себе JSON Web Token.
 	 * @return Список товаров, добавленных пользователем.
 	 */
 	@GetMapping
-	public List<ItemDto> getUserShoppingCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String header) {
-		final String token = header.replace(JwtHeader.BEARER, "");
-		int userId = jwtService.extractUserId(token);
+	public List<ItemDto> getUserShoppingCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+		int userId = extractUserId(authHeader);
 
 		return cartService.getUsersShoppingCart(userId);
 	}
@@ -41,16 +40,15 @@ public class CartController {
 	/**
 	 * Добавляет товар в корзину пользователя.
 	 *
-	 * @param header  Заголовок Authorization, который содержит в себе JSON Web Token.
-	 * @param request Запрос с данными на добавление товара и его количества в корзину.
+	 * @param authHeader Заголовок Authorization, который содержит в себе JSON Web Token.
+	 * @param request    Запрос с данными на добавление товара и его количества в корзину.
 	 * @return Объект InfoResponse с информацией и статусом о добавлении товара в корзину.
 	 */
 	@PostMapping
-	public ResponseEntity<InfoResponse> addItemToCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
+	public ResponseEntity<InfoResponse> addItemToCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
 													  @Valid
 													  @RequestBody CartRequest request) {
-		String token = header.replace(JwtHeader.BEARER, "");
-		int userId = jwtService.extractUserId(token);
+		int userId = extractUserId(authHeader);
 
 		return cartService.addItemToUsersShoppingCart(userId, request);
 	}
@@ -58,16 +56,31 @@ public class CartController {
 	/**
 	 * Удаляет товар из корзины пользователя.
 	 *
-	 * @param header  Заголовок Authorization, который содержит в себе JSON Web Token.
-	 * @param request Запрос с данными на удаление товара по id и его количества из корзины.
+	 * @param authHeader Заголовок Authorization, который содержит в себе JSON Web Token.
+	 * @param request    Запрос с данными на удаление товара по id и его количества из корзины.
 	 * @return Объект InfoResponse с информацией и статусом об удалении товара из корзины.
 	 */
 	@DeleteMapping
-	public ResponseEntity<InfoResponse> removeItemFromCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String header,
+	public ResponseEntity<InfoResponse> removeItemFromCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
 														   @RequestBody CartRequest request) {
-		String token = header.replace(JwtHeader.BEARER, "");
-		int userId = jwtService.extractUserId(token);
+		int userId = extractUserId(authHeader);
 
 		return cartService.removeItemFromUsersShoppingCart(userId, request);
+	}
+
+	/**
+	 * Удаляет все корзины пользователя.
+	 *
+	 * @param authHeader Заголовок Authorization, который содержит в себе JSON Web Token.
+	 */
+	@DeleteMapping("/delete_cart")
+	public void removeUsersCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
+		int userId = extractUserId(authHeader);
+		cartService.removeUsersCart(userId);
+	}
+
+	private int extractUserId(String authHeader) {
+		final String token = authHeader.replace(JwtHeader.BEARER, "");
+		return jwtService.extractUserId(token);
 	}
 }

@@ -12,7 +12,7 @@ CREATE TABLE botlemon.account_details
 
 
 
-CREATE OR REPLACE FUNCTION update_discount_percentage() RETURNS TRIGGER AS
+CREATE OR REPLACE FUNCTION botlemon.update_discount_percentage() RETURNS TRIGGER AS
 $$
 BEGIN
     NEW.discount_percentage :=

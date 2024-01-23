@@ -25,9 +25,11 @@ public class RouteValidator {
 	private final Set<String> openApiEndpoints = Set.of(
 
 			//Authentication service
-			"/v1/api/authorization",
-			"/v1/api/auth/register",
-			"/v1/api/auth/activate",
+			//TODO проверить, есть ли у меня /authorization
+			"/v1/api/auth",
+//			"/v1/api/auth/authorization",
+//			"/v1/api/auth/register",
+//			"/v1/api/auth/activate",
 
 			//Item service
 			"/v1/api/items/all_items",
@@ -48,15 +50,16 @@ public class RouteValidator {
 		put("/v1/api/items/edit", ADMIN_ROLE);
 		put("/v1/api/items/delete/", ADMIN_ROLE);
 
-		put("v1/api/cart", ALL_ROLES);
+		put("/v1/api/cart", ALL_ROLES);
 		put("/v1/api/review/add", ALL_ROLES);
 		put("/v1/api/review/edit", ALL_ROLES);
-		put("v1/api/account/details", ALL_ROLES);
+		put("/v1/api/account/details", ALL_ROLES);
 
 		put("/v1/api/email", NO_ACCESS);
 		put("/v1/api/storage", NO_ACCESS);
 		put("/v1/api/users", NO_ACCESS);
-		put("v1/api/account/create", NO_ACCESS);
+		put("/v1/api/account/create", NO_ACCESS);
+		put("/v1/api/account/update_login_date", NO_ACCESS);
 	}};
 
 	/**

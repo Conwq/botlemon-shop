@@ -37,4 +37,11 @@ public interface CartService {
 	 * @return Ответ с информацией об операции и статус кодом.
 	 */
 	ResponseEntity<InfoResponse> removeItemFromUsersShoppingCart(int userId, CartRequest request);
+
+	/**
+	 * Удаляет все существующие корзины пользователя.
+	 *
+	 * @param userId Идентификатор пользователя, чья корзина будет удалена.
+	 */
+	void removeUsersCart(int userId);
 }

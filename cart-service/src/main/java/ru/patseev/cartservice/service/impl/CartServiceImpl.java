@@ -41,7 +41,7 @@ public class CartServiceImpl implements CartService {
 		return cartRepository
 				.findAllByUserEntityId(userId)
 				.stream()
-				.map(this::mapCartEntityToItemDtoWithQuantity)
+				.map(this::mapToDto)
 				.collect(Collectors.toList());
 	}
 
@@ -90,6 +90,12 @@ public class CartServiceImpl implements CartService {
 		return createResponse(Actions.REMOVE, HttpStatus.OK);
 	}
 
+	@Override
+	@Transactional
+	public void removeUsersCart(int userId) {
+		cartRepository.deleteAllByUserEntityId(userId);
+	}
+
 	/*
 	 * Получение сущности Cart по userId и itemId, и меняет количество товара, добавляя к старому значение новое.
 	 * Если не найдено - то возвращает новую сущность с количеством, которое указал пользователь.
@@ -108,7 +114,7 @@ public class CartServiceImpl implements CartService {
 	/*
 	 * Создание Dto, для отправки информации пользователю
 	 */
-	private ItemDto mapCartEntityToItemDtoWithQuantity(CartEntity cartEntity) {
+	private ItemDto mapToDto(CartEntity cartEntity) {
 		ItemEntity itemEntity = cartEntity.getItemEntity();
 		ItemDto itemDto = itemMapper.toDto(itemEntity);
 		itemDto.setQuantity(cartEntity.getQuantity());
