@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(schema = "botlemon", name = "orders_items")
 @Data
@@ -22,4 +24,5 @@ public class OrderItemEntity {
 	private OrderEntity order;
 	private Integer itemId;
 	private Integer quantity;
+	private BigDecimal price;
 }

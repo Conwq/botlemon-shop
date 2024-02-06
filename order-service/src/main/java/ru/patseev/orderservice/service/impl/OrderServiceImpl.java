@@ -27,17 +27,20 @@ public class OrderServiceImpl implements OrderService {
 	@Override
 	@Transactional
 	public void placeOrder(String authHeader) {
+		//TODO получать из запроса уже iTemDto с ценой - то есть исправить crtService
 		List<ItemDto> itemsList = cartServiceClient.sendRequestToReceiveUsersCart(authHeader);
 
 		if (itemsList.isEmpty()) {
 			throw new EmptyUsersCartException("Ваша корзина пуста.");
 		}
-		int userId = extractUserId(authHeader);
 
+		int userId = extractUserId(authHeader);
 		OrderEntity order = OrderEntity.builder()
 				.userId(userId).build();
-
 		orderRepository.save(order);
+
+		//TODO получать цену для единицы item * количество
+		//TODO получать персональную скидку account и высчитать цену за товар
 
 		itemsList.stream()
 				.map(dto ->
@@ -45,6 +48,7 @@ public class OrderServiceImpl implements OrderService {
 								.order(order)
 								.itemId(dto.id())
 								.quantity(dto.quantity())
+								.price(dto.totalPrice())
 								.build())
 				.forEach(orderItemRepository::save);
 

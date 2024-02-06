@@ -33,7 +33,6 @@ public class CartController {
 	@GetMapping
 	public List<ItemDto> getUserShoppingCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader) {
 		int userId = extractUserId(authHeader);
-
 		return cartService.getUsersShoppingCart(userId);
 	}
 
@@ -49,7 +48,6 @@ public class CartController {
 													  @Valid
 													  @RequestBody CartRequest request) {
 		int userId = extractUserId(authHeader);
-
 		return cartService.addItemToUsersShoppingCart(userId, request);
 	}
 
@@ -64,7 +62,6 @@ public class CartController {
 	public ResponseEntity<InfoResponse> removeItemFromCart(@RequestHeader(HttpHeaders.AUTHORIZATION) String authHeader,
 														   @RequestBody CartRequest request) {
 		int userId = extractUserId(authHeader);
-
 		return cartService.removeItemFromUsersShoppingCart(userId, request);
 	}
 

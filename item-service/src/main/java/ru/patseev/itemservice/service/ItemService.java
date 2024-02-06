@@ -19,7 +19,7 @@ public interface ItemService {
 	 * @param header Заголовок авторизации. Он может быть null.
 	 * @return Возвращает предмет.
 	 */
-	ItemDto getItemById(int itemId, @Nullable String header);
+	ItemDto getItem(int itemId, @Nullable String header);
 
 	/**
 	 * Получает все доступные предметы.

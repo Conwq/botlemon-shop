@@ -33,8 +33,8 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public ItemDto getItemById(int itemId,
-							   @Nullable String header) {
+	public ItemDto getItem(int itemId,
+						   @Nullable String header) {
 		return itemRepository
 				.findById(itemId)
 				.map(item -> this.toDto(item, header))

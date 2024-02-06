@@ -1,4 +1,4 @@
-package ru.patseev.itemservice.controller;
+package ru.patseev.itemservice.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

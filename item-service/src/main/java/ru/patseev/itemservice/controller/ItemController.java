@@ -18,7 +18,6 @@ import java.util.List;
 @RequestMapping("/v1/api/items")
 @RequiredArgsConstructor
 public class ItemController {
-
 	private final ItemService itemService;
 
 	/**
@@ -31,7 +30,7 @@ public class ItemController {
 	@GetMapping("/item/{itemId}")
 	public ItemDto getItem(@PathVariable("itemId") int itemId,
 						   @RequestHeader(required = false, name = HttpHeaders.AUTHORIZATION) String header) {
-		return itemService.getItemById(itemId, header);
+		return itemService.getItem(itemId, header);
 	}
 
 	/**

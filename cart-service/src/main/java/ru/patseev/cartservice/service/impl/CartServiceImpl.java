@@ -74,7 +74,7 @@ public class CartServiceImpl implements CartService {
 	@Transactional
 	public ResponseEntity<InfoResponse> removeItemFromUsersShoppingCart(int userId, CartRequest request) {
 		int quantity;
-		CartEntity cartEntity = this.getCartEntityByUserIdAndItemId(userId, request.itemId());
+		CartEntity cartEntity = this.getCartEntity(userId, request.itemId());
 		if (cartEntity.getQuantity() <= request.quantity()) {
 			quantity = cartEntity.getQuantity();
 			cartRepository.delete(cartEntity);
@@ -125,7 +125,7 @@ public class CartServiceImpl implements CartService {
 	/*
 	 * Получение сущности Item по itemId, если не найдено - то выкидывается ошибка
 	 */
-	private ItemEntity getItemEntityByItemId(int itemId) {
+	private ItemEntity getItemEntity(int itemId) {
 		return itemRepository
 				.findById(itemId)
 				.orElseThrow(() -> new ItemNotFoundException("Item not found"));
@@ -134,7 +134,7 @@ public class CartServiceImpl implements CartService {
 	/*
 	 * Получение сущности User по userId, если не найдено - то выкидывается ошибка
 	 */
-	private UserEntity getUserEntityByUserId(int userId) {
+	private UserEntity getUserEntity(int userId) {
 		return userRepository
 				.findById(userId)
 				.orElseThrow(() -> new UserNotFoundException("User not found"));
@@ -143,7 +143,7 @@ public class CartServiceImpl implements CartService {
 	/*
 	 * Получение сущности Cart по userId и itemId, если не найдено - то выкидывается ошибка
 	 */
-	private CartEntity getCartEntityByUserIdAndItemId(int userId, int itemId) {
+	private CartEntity getCartEntity(int userId, int itemId) {
 		return cartRepository
 				.findByUserEntityIdAndItemEntityId(userId, itemId)
 				.orElseThrow(() -> new ItemNotFoundException("Cart not found"));
@@ -153,8 +153,8 @@ public class CartServiceImpl implements CartService {
 	 * Создание сущности CartEntity
 	 */
 	private CartEntity buildCartEntity(int userId, int itemId, int quantity) {
-		UserEntity userEntity = this.getUserEntityByUserId(userId);
-		ItemEntity itemEntity = this.getItemEntityByItemId(itemId);
+		UserEntity userEntity = this.getUserEntity(userId);
+		ItemEntity itemEntity = this.getItemEntity(itemId);
 
 		CartEntity cartEntity = CartEntity.builder()
 				.userEntity(userEntity)
